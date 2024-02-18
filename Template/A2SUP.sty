@@ -1,0 +1,5012 @@
+%%%%%%%%%  Dernière MAJ : mardi 30 janvier 2024, 10:18
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% TEMPLATE %%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% N'hésite pas à copier-coller, et à retirer le mode commentaire grâce au raccourci "Alt cmd :" (Mac) ou "ctrl /" (Windows) 
+
+
+
+% \documentclass[12pt]{article}
+
+% \usepackage{A2SUP}
+
+% \informations{
+%                 PASSLAS = {},
+%                      UE = {},
+%                 Support = {},
+%         NumeroDuSupport = {},
+%       SujetOuCorrection = {},
+%           Coordinateurs = {},
+%              Redacteurs = {},
+%              Relecteurs = {},
+%     ConvertisseursLatex = {},
+%         TuteursEnSeance = {},
+%                Testeurs = {},
+                   % Team = {},
+                   %   VP = {},
+%      RecommandationsSpe = {},
+%              TitreExtra = {},
+%              TitreCours = {},
+%       NombreDeQuestions = {},
+%    FacRedactionOuCollab = {},
+%             ProfDuCours = {},
+%      RemerciementsBonus = {},
+%              TiersTemps = {},
+%     CorrectionItemIsole = {}
+%     }
+
+% \begin{document}
+
+% \optimisation
+
+% ...enonce...
+
+% ...\inseparable... % tout ce qui suit cette commande sera inséparable de la question du dessous, pas de saut de page entre les deux donc (optionnel)
+
+% ...enonce introduisant la question... (donc inséparable de la qst)
+
+% \question{}
+% {}
+% {}
+% {}
+% {}
+% {}
+% {}
+
+% \vrai{}
+
+% \correction{
+% \correctionitem{}
+
+% }
+
+% \end{document}
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%% Fin de template %%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%% Informations générales
+\NeedsTeXFormat{LaTeX2e}[1999/01/01]
+\ProvidesPackage{A2SUP}[2024/01/23]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%%%% Inscrit le temps de compilation dans le "raw logs" (TOC)
+\RequirePackage{etoolbox}%
+\RequirePackage{l3benchmark}%
+\ExplSyntaxOn%
+\AfterEndDocument { \benchmark_toc: }%
+\use:n%
+  {%
+    \ExplSyntaxOff%
+    \benchmark_tic:%
+  }%
+
+
+
+%% Test pour s'assurer qu'on est passé en LuaTex
+\newif\ifluatex%
+\ifx\directlua\undefined % Indéfini si pas luatex
+  \PackageError{A2SUP}{COMPILATEUR !}{Il faut changer le compilateur pdfLatex en LuaLaTeX !\MessageBreak%
+  Suis ce lien si tu ne sais pas comment faire : https://fr.overleaf.com/learn/how-to/Changing_compiler}%
+  \stop%
+\else%
+  \null%
+\fi%
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PACKAGES 
+    %% Langue et texte
+\RequirePackage[french]{babel}
+\RequirePackage{icomma}
+\RequirePackage[T1]{fontenc} 
+    %% Création de clés
+\RequirePackage{xkeyval}
+    %% Insertion de PDF, d'images, et de dessins
+\RequirePackage{pdfpages}
+\RequirePackage{graphicx}
+\RequirePackage{tikz}
+\usetikzlibrary{shadings,shadows,spy, shapes.misc, patterns}
+\RequirePackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepgfplotslibrary{fillbetween}
+    %% Maths
+\RequirePackage{amssymb}
+\RequirePackage{amsmath} % obsolète si pas mathtools !
+\RequirePackage{mathtools}
+\RequirePackage{ifthen}
+\RequirePackage{pgf} % Latex calculatrice
+\RequirePackage{pgffor}
+\RequirePackage{tkz-tab}
+\RequirePackage{pst-tree}
+    %% Traitement du texte
+\RequirePackage{xfakebold}
+\RequirePackage{wrapfig}
+\RequirePackage{enumitem}
+\RequirePackage{lipsum}
+\RequirePackage{framed} % intérêt ?
+\RequirePackage[framemethod=tikz]{mdframed} % anciennement utilisé pour les cadres
+\RequirePackage[many]{tcolorbox}
+\RequirePackage{ulem}
+\RequirePackage{anyfontsize}% pour avoir plus de choix en tailles de polices
+\RequirePackage{relsize} % a retirer
+\RequirePackage{dashrule}
+\RequirePackage{moresize}
+\RequirePackage{fancybox}
+\RequirePackage{fancyhdr}
+\RequirePackage{setspace}
+\RequirePackage[]{hyperref}
+\RequirePackage{xcolor}
+\RequirePackage{xstring}
+    %% Packages sympas
+\RequirePackage{realhats}
+\RequirePackage[tikz]{bclogo}
+\RequirePackage{lmodern}
+\RequirePackage{emoji}  % LuaLaTeX
+%\RequirePackage{etoolbox} % déjà mobilisé pour TOC
+    %% Chimie
+\RequirePackage{chemfig}
+\RequirePackage{chemmacros}
+\RequirePackage[version=4]{mhchem}
+
+\RequirePackage{lastpage}
+\RequirePackage{tabularx}
+\RequirePackage{varwidth} % Pas utilisé ?
+%%%%%%%%%
+
+
+\tcbuselibrary{breakable}
+
+
+
+\setlength{\parindent}{0pt} % Eliminer les alinéas
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\makeatletter % changes the catcode of @ so it can be used freely. Don't forget to put \makeatother before \begin{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% définition des clés pour la newcommand informations %%%%
+%%%     Y faire appel par \cmdcle@sujet@...             %%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\define@cmdkey[cle]{sujet}{PASSLAS}{}               % PASS ou L.AS
+\define@cmdkey[cle]{sujet}{UE}{}                    % numero de l'ue
+\define@cmdkey[cle]{sujet}{Support}{}               % type de support
+\define@cmdkey[cle]{sujet}{NumeroDuSupport}{}       % numero de support
+\define@cmdkey[cle]{sujet}{SujetOuCorrection}{}
+\define@cmdkey[cle]{sujet}{NombreDeQuestions}{}     % nombre de questions
+\define@cmdkey[cle]{sujet}{RecommandationsSpe}{}    % recommandations spécifiques à l'épreuve
+\define@cmdkey[cle]{sujet}{Redacteurs}{}            % rédacteurs
+\define@cmdkey[cle]{sujet}{Relecteurs}{}            % relecteurs
+\define@cmdkey[cle]{sujet}{ConvertisseursLatex}{}   % Convertisseurs LaTeX
+\define@cmdkey[cle]{sujet}{Testeurs}{}              % Testeurs du sujet
+\define@cmdkey[cle]{sujet}{VP}{}                    % vp tuto
+\define@cmdkey[cle]{sujet}{Team}{}                  % nom de team
+\define@cmdkey[cle]{sujet}{Coordinateurs}{}         % sous la coordination de ... ?"
+\define@cmdkey[cle]{sujet}{TitreCours}{}            % titre de la fiche 
+\define@cmdkey[cle]{sujet}{TitreExtra}{}            % titre de l'extra
+\define@cmdkey[cle]{sujet}{FacRedactionOuCollab}{}  % Le support a été proposé en collab avec l'équipe pédagogique, ou a été rédigé par l'équipe pédagogique de l'université ?
+\define@cmdkey[cle]{sujet}{ProfDuCours}{}           % Information utile pour la fiche
+\define@cmdkey[cle]{sujet}{TuteursEnSeance}{}       % tuteurs ayant corrige un support en seance
+\define@cmdkey[cle]{sujet}{RemerciementsBonus}{}    % Remerciements personnalisés (à écrire entièrement)
+\define@cmdkey[cle]{sujet}{TiersTemps}{}            % oui/non
+\define@cmdkey[cle]{sujet}{CorrectionItemIsole}{}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%   Assigner des valeurs aux clés                             %%%%%
+%%%% Adapter la géométrie du document en fonction des paramètres %%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\informations}[1]
+{\setkeys[cle]{sujet}{#1}% Valeurs des clés
+
+\IfSubStr{\cmdcle@sujet@SujetOuCorrection}{orrec}%
+        {% Correction
+        \RequirePackage[a3paper,landscape,twocolumn,left=1cm,right=1cm,bottom=2.3cm,top=2.3cm,columnsep=1.5cm]{geometry}% ,twoside
+        
+        % \renewcommand{\tiny}{\fontsize{4}{4.8}\selectfont}
+        % \renewcommand{\scriptsize}{\fontsize{5}{6}\selectfont}
+        % \renewcommand{\footnotesize}{\fontsize{6}{7.2}\selectfont}
+        % \renewcommand{\small}{\fontsize{7}{8.4}\selectfont}
+        % \renewcommand{\normalsize}{\fontsize{8}{9.6}\selectfont}
+        % \renewcommand{\large}{\fontsize{10}{12}\selectfont}
+        % \renewcommand{\Large}{\fontsize{12}{14.4}\selectfont}
+        % \renewcommand{\LARGE}{\fontsize{14}{16.8}\selectfont}
+        % \renewcommand{\huge}{\fontsize{16}{19.2}\selectfont}
+        % \renewcommand{\Huge}{\fontsize{19}{22.8}\selectfont}
+        \renewcommand{\HUGE}{\fontsize{30}{36}\selectfont}%
+        %
+        }%
+            {%Pas une correction
+            \RequirePackage[a4paper,margin=2cm]{geometry}%
+
+            \IfSubStr{\cmdcle@sujet@TiersTemps}{u}{\renewcommand{\normalsize}{\fontsize{14}{16.1}\selectfont}\onehalfspacing}%
+            \renewcommand{\HUGE}{\fontsize{40}{40}\selectfont}%
+
+            
+            \pagestyle{fancy}%
+            \renewcommand{\headrulewidth}{0pt}%
+            \fancyhead{}%
+            \renewcommand{\footrulewidth}{0pt}%
+            \fancyfoot[C]{}%
+            \fancyfoot[L]{}%
+            \fancyfoot[R]{\Large\thepage}%
+            }%
+
+
+
+
+
+
+%%%%%%% Paramètres de MEP des items pour la correction
+% HISTO ET SANTE PUBLIQUE PASS
+\ifthenelse{\cmdcle@sujet@UE=5 \OR \cmdcle@sujet@UE=6}{%
+\newcommand{\MEPquestion}[2]{%
+\textbf{Question ##1}\\%
+\textbf{##2}%
+\def\indentationitemsujet{-0.9em}%
+}%
+
+\newcommand{\specificitePremiereQuestionIsolee}{%
+\ifthenelse{\thenumcorrectionitem=1}%
+    {\vspace*{.1cm}}%
+    {\end{minipage}%
+    
+    }%
+\begin{minipage}{\linewidth}%
+}%
+
+\newcommand{\specificiteSecondeQuestionIsolee}{%
+\ifthenelse{\thenumcorrectionitem=5}%
+    {\end{minipage}}%
+    {}\hfill}%
+}{% MATHEMATIQUES
+\IfSubStr{\cmdcle@sujet@UE}{9}{%
+\newcommand{\MEPquestion}[2]{%
+\hangindent=2.5em%
+\hangafter=1%
+\textbf{Question ##1}\quad ##2%
+\def\indentationitemsujet{2.5em}%
+}%
+
+\newcommand{\specificitePremiereQuestionIsolee}{}%
+\newcommand{\specificiteSecondeQuestionIsolee}{}%
+}{%
+%%% MEP par défaut
+\newcommand{\MEPquestion}[2]{%
+\textbf{Question ##1}\\%
+\textbf{##2}%
+\def\indentationitemsujet{-0.9em}%
+\newcommand{\specificitePremiereQuestionIsolee}{}%
+\newcommand{\specificiteSecondeQuestionIsolee}{}%
+}}}%
+%%%%%%%%%%%%%%%%%%%%%%%%%% Fin de paramètres de MEP
+
+
+
+
+
+%%%%%%% Initialisation des commandes ici (pour éviter de les introduire dans des boucles...
+\def\UEOuModule{%
+	\IfSubStr{\cmdcle@sujet@PASSLAS}{PASS}{UE}{Module}%
+}%
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\IfSubStr{\cmdcle@sujet@CorrectionItemIsole}{u}{%
+% redéfinition de la commande pour l'histo et la SP (répétition des items avant leur correction)
+\renewcommand{\correctionitem}[1]%
+{%
+\addtocounter{numcorrectionitem}{1}% = 1 s'il s'agit du (des) premier(s) item(s) corrigé(s)
+
+\renewcommand{\emojicorrectionitem}{\bcquestion}%
+
+\specificitePremiereQuestionIsolee%
+
+
+\directlua{%
+liste="ABCDE"
+for item in liste:gmatch"." do
+    if string.find("#1", "tem "..item) then
+        if string.find("\bilan", item) then
+            token.set_macro("emojicorrectionitem", "\\color{green!50!black}\\checkmark")
+        else
+            token.set_macro("emojicorrectionitem", "\\emoji{x}")
+        end
+        break
+    end
+end
+
+if "\thenumcorrectionitem"==1 then
+    tex.print("")
+else
+    tex.print("\\vspace{.2cm}")
+end
+}
+
+\setlength{\longueurintroitem}%
+{\widthof{\small \bf #1 : }}%
+
+\begin{tcolorbox}[%
+    colback=black!8,%
+    colframe=black,%
+    boxrule=.5pt,%
+    parbox=false,%
+    top=0mm,%
+    bottom=0mm,%
+    right=0mm,%
+    left=0mm,%
+    enlarge left by = 0mm,%
+    width=\linewidth%
+    ]%
+        \begin{minipage}{1.1em}%
+            \begin{tikzpicture}%
+                \draw (0,0) node {\emojicorrectionitem};%
+            \end{tikzpicture}%
+        \end{minipage}\; %
+        \begin{minipage}[t]{\longueurintroitem}%
+            {\small \bf #1 :}%
+        \end{minipage}%
+        \begin{minipage}[t]{\linewidth-\longueurintroitem-1.8em}%
+            \ifthenelse{\cmdcle@sujet@UE=5 \OR \cmdcle@sujet@UE=6}%
+            {\small\mesitems{\thenumcorrectionitem}}{}%
+        \end{minipage}%
+\end{tcolorbox}%
+\vspace{0em}%
+}%
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% Fin de l'initialisation
+} % Fin de \informations
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%   Mot du RM, sous format :       Titre            %%%%%%%%%%%
+%%%%%%%%%                                  Corps de texte   %%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\motRM}[2]
+{%
+\IfSubStr{\cmdcle@sujet@SujetOuCorrection}{ujet}%
+    {%
+    % Si c'est un sujet, alors le mot du RM ne s'affichera pas (sujet de GT ou de tuto).
+    }%
+    {%
+		\begin{tcolorbox}[boxrule=.5pt,colback=black!3!white]%
+		{\Large \underline{\textsc{#1}}}\\[.007\textheight]%
+		
+		#2%
+		
+		\end{tcolorbox}%
+  
+		\newpage%
+  
+    }%
+} % fin de \motRM
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%   PAGE DE COUVERTURE   %%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%% EXAMEN BLANC/TUTO  %%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\entetesujet}[4] % Alléger le code \rectotuto
+{%
+{\huge %
+\UEOuModule #1 : #2}\\\vspace{0.01\textheight}%
+{\Huge \emoji{#3}}\\\vspace{0.03\textheight}%
+{\LARGE \textnormal{Durée de l'épreuve :}  \textbf{#4}}%
+}
+
+
+\newcommand{\rectotuto}
+{%
+\begin{center}%
+\includegraphics[width=.18\linewidth]{logo.png}\\[0.01\textheight]%
+{\large Association pour l’Accès Santé – Université Paris Cité\\%
+Année Universitaire 2023 - 2024}%
+
+\vfill%
+
+{\huge \bf%
+\IfSubStr{\cmdcle@sujet@SujetOuCorrection}{orrec}{%
+CORRECTION%
+}{%
+\IfSubStr{\cmdcle@sujet@SujetOuCorrection}{uje}{%
+SUJET%
+}{%
+\textcolor{red}{Indique la nature du support (sujet ou correction) !%
+}}}}%
+
+\vfill%
+
+{\LARGE \textbf{Examen Blanc n°\cmdcle@sujet@NumeroDuSupport \space \cmdcle@sujet@PASSLAS}}%
+
+\vfill%
+
+\textbf{%
+\ifthenelse{\cmdcle@sujet@UE = 1}{% 
+\entetesujet%
+		{1}%
+		{Chimie}%
+		{test-tube}%
+		{1h30}}%
+{%
+\ifthenelse{\cmdcle@sujet@UE = 2}{%
+\entetesujet%
+    {2}%
+    {Biochimie}%
+    {dna}%
+    {1h30}}%
+{%
+\ifthenelse{\cmdcle@sujet@UE = 3}{%
+\entetesujet%
+    {3}%
+    {Biologie Cellulaire}%
+    {microbe}%
+    {1h30}}%
+{%
+\ifthenelse{\cmdcle@sujet@UE = 4}{%
+\entetesujet%
+    {4}%
+    {Physique}%
+    {star2}%
+    {1h30}}%
+{%
+\ifthenelse{\cmdcle@sujet@UE = 5}{%
+\entetesujet%
+    {5}%
+    {Histologie - Embryologie}%
+    {lungs}%
+    {\IfSubStr{\cmdcle@sujet@TiersTemps}{u}{1h20}{1h}}}%
+{%
+\ifthenelse{\cmdcle@sujet@UE = 6}{%
+\entetesujet%
+    {6}%
+    {Santé Publique}%
+    {hospital}%
+    {45 minutes}}%
+{%
+\ifthenelse{\cmdcle@sujet@UE = 7}{%
+\entetesujet%
+    {7}%
+    {SHS}%
+    {cherry-blossom}%
+    {1h30}}%
+{%
+\ifthenelse{\cmdcle@sujet@UE = 8}{%
+\entetesujet%
+    {8}%
+    {ICM}%
+    {pill}%
+    {1h}}%
+{%
+\ifthenelse{\cmdcle@sujet@UE = 9}{%
+\entetesujet%
+    {9}%
+    {Mathématiques - Biostatistiques}%
+    {triangular-ruler}%
+    {\IfSubStr{\cmdcle@sujet@TiersTemps}{u}{1h20}{1h}}}%
+{%
+\ifthenelse{\cmdcle@sujet@UE = 10}{%
+\entetesujet%
+    {10}%
+    {Anatomie}%
+    {anatomical-heart}%
+    {45 minutes}}%
+{%
+\ifthenelse{\cmdcle@sujet@UE = 11}{%
+\entetesujet%
+    {11}%
+    {Biophysique}%
+    {radioactive}%
+    {1h30}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{med}{%
+\entetesujet%
+    {12}%
+    {Spécialité Médecine Rééducation}%
+    {stethoscope}%
+    {1h}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{pharma}{%
+\entetesujet%
+    {12}%
+    {Spécialité Pharmacie}%
+    {alembic}%
+    {1h}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{maieu}{%
+\entetesujet%
+    {12}%
+    {Spécialité Maïeutique}%
+    {teddy-bear}%
+    {1h}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{odonto}{%
+\entetesujet%
+    {12}%
+    {Spécialité Odontologie}%
+    {tooth}{1h}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{1.1}{%
+\entetesujet%
+    {1.1}%
+    {Chimie}%
+    {test-tube}%
+    {}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{1.2}{%
+\entetesujet%
+    {1.2}%
+    {Biophysique}%
+    {radioactive}%
+    {}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{2.1}{%
+\entetesujet%
+    {2.1}%
+    {Biochimie}%
+    {dna}%
+    {}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{2.2}{%
+\entetesujet%
+    {2.2}%
+    {Biologie Cellulare}%
+    {microbe}%
+    {}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{3.1}{%
+\entetesujet%
+    {3.1}%
+    {Histologie Embryologie Anatomie}%
+    {anatomical-heart}%
+    {}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{3.2}{%
+\entetesujet%
+    {3.2}%
+    {ICM}%
+    {pill}%
+    {}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{4.1}{%
+\entetesujet%
+    {4.1}%
+    {SHS}%
+    {cherry-blossom}%
+    {}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{4.2}{%
+\entetesujet%
+    {4.2}%
+    {Santé Publique}%
+    {hospital}%
+    {}}%
+{\LARGE \color{red} Fais attention à l'UE ou ECUE que tu as indiqué !}}}}}}}}}}}}}}}}}}}}}}}}%
+\end{center}%
+
+\vfill%
+
+
+A LIRE AVANT DE COMMENCER L'\'EPREUVE%
+
+\smallskip%
+
+\fbox{\begin{minipage}{\linewidth-2\fboxsep-2\fboxrule}%
+\bf Vérifiez que les informations saisies sur votre grille QCM sont correctes : nom, prénom et numéro étudiant.%
+
+Les correcteurs liquides ou en ruban de type Blanco, Tipp-Ex, et autres sont interdits car chaque question comporte une ligne de droit au remords.%
+
+Seule l'utilisation du stylo à bille noir est autorisée pour cocher les grilles.%
+\end{minipage}}%
+
+\medskip%
+
+INFORMATIONS R\'EGLEMENTAIRES%
+
+\smallskip%
+
+\fbox{%
+\begin{minipage}{\linewidth-2\fboxsep-2\fboxrule}%
+\setlist[itemize]{left=0cm, itemsep=0pt}%
+\begin{itemize}[label=\scriptsize $\bullet$]%
+\item Les questions sans réponse seront considérées comme nulles.%
+\item Une grille QCM est à remplir pour l’ensemble de l’épreuve.%
+\item Veiller à remplir complètement toute la surface des cases choisies.%
+\item Ne pas gratter, ne pas raturer, ne pas mettre de croix ni aucun autre signe.%
+\item Toute fraude ou tentative de fraude fera l'objet de poursuites disciplinaires (Décret n°92-657 du 13 juillet 1992). Tout signe distinctif porté sur la grille QCM pouvant indiquer sa provenance constitue une fraude.%
+\item \ifthenelse{\cmdcle@sujet@UE=4 \OR \cmdcle@sujet@UE=9 \OR \cmdcle@sujet@UE=11}{Les calculatrices \textbf{sont autorisées}}{Les calculatrices \textbf{ne sont pas autorisées}}%
+\item Aucun candidat n'est admis à quitter la salle d'examen avant la fin de l'épreuve.%
+\end{itemize}%
+\end{minipage}}%
+
+\medskip%
+
+RECOMMANDATIONS SP\'ECIFIQUES A L'\'EPREUVE%
+
+\smallskip%
+
+\fbox{%
+\begin{minipage}{\linewidth-2\fboxsep-2\fboxrule}%
+\cmdcle@sujet@RecommandationsSpe\,%
+\end{minipage}}%
+
+\medskip%
+
+INFORMATIONS SUR L'\'EPREUVE%
+
+\smallskip%
+
+\fbox{%
+\begin{minipage}{\linewidth-2\fboxsep-2\fboxrule}%
+    \bf Le sujet contient \pgfmathtruncatemacro\result{\getpagerefnumber{LastPage}-1}\result\ pages numérotées de 1 à \pgfmathtruncatemacro\result{\getpagerefnumber{LastPage}-1}\result\ et comporte \cmdcle@sujet@NombreDeQuestions\ questions.%
+
+    Merci de vérifier au début de l’épreuve que le sujet est complet.%
+\end{minipage}}%
+
+\newpage%
+
+} % fin rectotuto
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%  Fiche & Extra  %%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Encadré contenant les informations sur les bureaux (adresses, salles)
+\newcommand{\encadreAsso}%
+{%
+\colorbox{red!90!black!20}{%
+\begin{minipage}{\linewidth-2\fboxrule-2\fboxsep}%
+
+\centering%
+
+\resizebox{\linewidth-2\fboxrule-2\fboxsep}{!}{\large\bf ASSOCIATION POUR L'ACCÈS SANTÉ -- UNIVERSITÉ PARIS CITÉ}%
+
+\medskip%
+
+\Large \text{A2SUP}%
+
+\medskip%
+
+\large%
+Bureau T203 – \href{https://maps.app.goo.gl/21gyrDiNQt6ikTCn7}{45 rue des Saints-Pères, 75006 Paris}%
+
+\href{https://drive.google.com/file/d/1Xv6cpGgC0LXmQeqRaWwzA-bXUfORKstL/view?usp=share_link}{Bureau TP15} – \href{https://maps.app.goo.gl/pXwYtdxaQ6KWriaZA}{4 avenue de l’Observatoire, 75006 Paris}%
+
+Bureau 101 – \href{https://maps.app.goo.gl/GASjVHM45TMCeKiT8}{15 rue de l’Ecole de Médecine, 75006 Paris}%
+
+\medskip%
+
+\href{https://www.a2sup.fr/}{www.a2sup.fr}%
+\end{minipage}%
+}%
+}% fin
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\newcommand{\rectoFiche}%
+{%
+\begin{center}%
+\includegraphics[width=.25\linewidth]{logo.png}%
+
+\textsc{\Large%
+Tutorat \cmdcle@sujet@PASSLAS\\[-4pt]%
+Université Paris Cité\\[5pt]%
+**%
+}%
+        
+\vfill
+
+%%%%%% ue et emoji %%%%%
+\ifthenelse{\cmdcle@sujet@UE = 1}{%
+\entete%
+    {1}%
+    {Chimie}%
+    {test-tube}}%
+{%
+\ifthenelse{\cmdcle@sujet@UE = 2}{%
+\entete%
+    {2}%
+    {Biochimie}%
+    {dna}}%
+{%
+\ifthenelse{\cmdcle@sujet@UE = 3}{%
+\entete%
+    {3}%
+    {Biologie Cellulaire}%
+    {microbe}}%
+{%
+\ifthenelse{\cmdcle@sujet@UE = 4}{%
+\entete%
+    {4}%
+    {Physique}%
+    {star2}}%
+{%
+\ifthenelse{\cmdcle@sujet@UE = 5}{%
+\entete%
+    {5}%
+    {\resizebox{\linewidth}{!}{Histologie - Embryologie}}%
+    {lungs}}%
+{%
+\ifthenelse{\cmdcle@sujet@UE = 6}{%
+\entete%
+    {6}%
+    {Santé Publique}%
+    {hospital}}%
+{%
+\ifthenelse{\cmdcle@sujet@UE = 7}{%
+\entete%
+    {7}%
+    {SHS}%
+    {cherry-blossom}}%
+{%
+\ifthenelse{\cmdcle@sujet@UE = 8}{%
+\entete%
+    {8}%
+    {ICM}%
+    {pill}}%
+{%
+\ifthenelse{\cmdcle@sujet@UE = 9}{%
+\entete%
+    {9}%
+    {\resizebox{\linewidth}{!}{Mathématiques - Biostatistiques}}%
+    {triangular-ruler}}%
+{%
+\ifthenelse{\cmdcle@sujet@UE = 10}{%
+\entete%
+    {10}%
+    {Anatomie}%
+    {anatomical-heart}}%
+{%
+\ifthenelse{\cmdcle@sujet@UE = 11}{%
+\entete%
+    {11}%
+    {Biophysique}%
+    {radioactive}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{ed}{%
+\entete%
+    {12}%
+    {\textbf{SMR}}%
+    {stethoscope}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{arma}{%
+\entete%
+    {12}%
+    {Spé Pharmacie}%
+    {alembic}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{eu}{%
+\entete%
+    {12}%
+    {Spé Maïeutique}%
+    {teddy-bear}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{donto}{%
+\entete%
+    {12}%
+    {Spé Odontologie}%
+    {tooth}}%
+{%
+%%%% ecue des L.AS %%%%%%%%
+\IfSubStr{\cmdcle@sujet@UE}{1.1}{%
+\entete%
+    {1.1}%
+    {Chimie}%
+    {test-tube}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{1.2}{%
+\entete%
+    {1.2}%
+    {Biophysique}%
+    {radioactive}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{2.1}{%
+\entete%
+    {2.1}%
+    {Biochimie}%
+    {dna}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{2.2}{%
+\entete%
+    {2.2}%
+    {Biologie Cellulaire}%
+    {microbe}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{3.1}{%
+\entete%
+    {3.1}%
+    {\resizebox{.7\linewidth}{!}{\begin{minipage}{\linewidth}\centering Histologie \\ Embryologie \\ Anatomie\end{minipage}}}%
+    {anatomical-heart}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{3.2}{%
+\entete%
+    {3.2}%
+    {ICM}%
+    {pill}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{4.1}{%
+\entete%
+    {4.1}%
+    {SHS}%
+    {cherry-blossom}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{4.2}{%
+\entete%
+    {4.2}%
+    {Santé Publique}%
+    {hospital}}%
+{%
+{\LARGE \color{red} Attention à l'UE que tu as sélectionnée !}%
+}}}}}}}}}}}}}}}}}}}}}}}%
+
+\vfill%
+
+
+%%%%%%%%% Titres encadrés en haut et en bas %%%%%%%%%%%
+\rule{\linewidth}{1.5pt}%%%%%% trait supérieur 
+
+\bigskip%
+
+\fontsize{24}{24}\selectfont{\bf FICHE DE COURS N°\cmdcle@sujet@NumeroDuSupport}%
+
+\medskip
+
+\begin{minipage}{\linewidth}%
+\centering%
+\fontsize{23}{23}\selectfont%
+\cmdcle@sujet@TitreCours%
+\end{minipage}%
+
+\rule{\linewidth}{1.5pt}%%%%%% trait inférieur
+
+\bigskip\bigskip%
+
+\begin{minipage}{\linewidth}%
+\fontsize{12}{12}\selectfont%
+Il s'agit d'une fiche récapitulative non exhaustive des notions essentielles concernant vos cours. Cela ne remplace pas les diaporamas de cours et vos notes se rapportant aux explications des professeurs.%
+
+Il est primordial d'avoir compris ces notions avant tout « apprentissage par coeur » qui se révélerait absolument improductif. Le meilleur moyen de réussir reste la compréhension, un apprentissage consciencieux des diapositives et un entraînement régulier (nous vous conseillons de vous rendre régulièrement aux examens blancs du tutorat).%
+\end{minipage}%
+
+\medskip%
+
+\encadreAsso%
+
+\end{center}%
+
+\newpage%
+
+}% fin rectoFiche
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\newcommand{\rectoExtra}
+{%
+\begin{center}%
+\includegraphics[width=.25\linewidth]{logo.png}%
+
+\textsc{\Large%
+Tutorat \cmdcle@sujet@PASSLAS\\[-4pt]%
+Université Paris Cité\\[5pt]%
+**%
+}%
+
+\vfill%
+
+%%%%%% ue et emoji %%%%%
+\ifthenelse{\cmdcle@sujet@UE = 1}{%
+\entete%
+    {1}%
+    {Chimie}%
+    {test-tube}}%
+{%
+\ifthenelse{\cmdcle@sujet@UE = 2}{%
+\entete%
+    {2}%
+    {Biochimie}%
+    {dna}}%
+{%
+\ifthenelse{\cmdcle@sujet@UE = 3}{%
+\entete%
+    {3}%
+    {Biologie Cellulaire}%
+    {microbe}}%
+{%
+\ifthenelse{\cmdcle@sujet@UE = 4}{%
+\entete%
+    {4}%
+    {Physique}%
+    {star2}}%
+{%
+\ifthenelse{\cmdcle@sujet@UE = 5}{%
+\entete%
+    {5}%
+    {\resizebox{\linewidth}{!}{Histologie - Embryologie}}%
+    {lungs}}%
+{%
+\ifthenelse{\cmdcle@sujet@UE = 6}{%
+\entete%
+    {6}%
+    {Santé Publique}%
+    {hospital}}%
+{%
+\ifthenelse{\cmdcle@sujet@UE = 7}{%
+\entete%
+    {7}%
+    {SHS}%
+    {cherry-blossom}}%
+{%
+\ifthenelse{\cmdcle@sujet@UE = 8}{%
+\entete%
+    {8}%
+    {ICM}%
+    {pill}}%
+{%
+\ifthenelse{\cmdcle@sujet@UE = 9}{%
+\entete%
+    {9}%
+    {\resizebox{\linewidth}{!}{Mathématiques - Biostatistiques}}%
+    {triangular-ruler}}%
+{%
+\ifthenelse{\cmdcle@sujet@UE = 10}{% 
+\entete%
+    {10}%
+    {Anatomie}%
+    {anatomical-heart}}%
+{%
+\ifthenelse{\cmdcle@sujet@UE = 11}{% 
+\entete%
+    {11}%
+    {Biophysique}%
+    {radioactive}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{ed}{% 
+\entete%
+    {12}%
+    {\textbf{SMR}}%
+    {stethoscope}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{arma}{% 
+\entete%
+    {12}%
+    {Spé Pharmacie}%
+    {alembic}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{eu}{% 
+\entete%
+    {12}%
+    {Spé Maïeutique}%
+    {teddy-bear}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{donto}{% 
+\entete%
+    {12}%
+    {Spé Odontologie}%
+    {tooth}}%
+{%
+%%%% ecue des L.AS %%%%%%%
+\IfSubStr{\cmdcle@sujet@UE}{1.1}{%
+\entete%
+    {1.1}%
+    {Chimie}%
+    {test-tube}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{1.2}{%
+\entete%
+    {1.2}%
+    {Biophysique}%
+    {radioactive}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{2.1}{%
+\entete%
+    {2.1}%
+    {Biochimie}%
+    {dna}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{2.2}{%
+\entete%
+    {2.2}%
+    {Biologie Cellulaire}%
+    {microbe}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{3.1}{%
+\entete%
+    {3.1}%
+    {\resizebox{.7\linewidth}{!}{\begin{minipage}{\linewidth}\centering Histologie \\ Embryologie \\ Anatomie\end{minipage}}}%
+    {anatomical-heart}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{3.2}{%
+\entete%
+    {3.2}%
+    {ICM}%
+    {pill}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{4.1}{%
+\entete%
+    {4.1}%
+    {SHS}%
+    {cherry-blossom}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{4.2}{%
+\entete%
+    {4.2}%
+    {Santé Publique}%
+    {hospital}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{0}{
+\begin{center}
+\HUGE
+\LaTeX\\[1cm]
+\emoji{alien-monster}
+\end{center}
+}
+{
+{\LARGE \color{red} Attention à l'UE que tu as sélectionnée !}%
+}
+}}}}}}}}}}}}}}}}}}}}}}}%
+
+\vfill%
+
+
+%%%%%%%%% Titres encadrés en haut et en bas %%%%%%%%%%%
+\rule{\linewidth}{1.5pt}%%%%%% trait supérieur 
+
+\bigskip\bigskip%
+
+\fontsize{24}{24}\selectfont{\bf \cmdcle@sujet@TitreExtra}%
+
+\bigskip%
+
+\begin{minipage}{\linewidth}%
+\centering%
+\fontsize{23}{23}\selectfont%
+\cmdcle@sujet@TitreCours%
+\end{minipage}%
+
+\bigskip%
+
+\rule{\linewidth}{1.5pt}%%%%%% trait inférieur
+
+\vfill%
+
+\encadreAsso%
+
+\end{center}%
+
+\newpage%
+
+} % fin rectoExtra
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%  en-tête commun au GT, poly d'exos et de QCM, fiches, extras %%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\entete}[3]{% pour alléger les rectos
+\begin{center}%
+
+\fontsize{25}{25}\selectfont%
+
+\textsc{\UEOuModule\, #1}%
+    
+\HUGE\textsc{#2}%
+
+\smallskip%
+
+\emoji{#3}%
+\end{center}%
+
+\normalsize%
+
+}
+
+
+\newcommand{\rectoGt}
+{%
+\begin{center}%
+\includegraphics[width=.25\linewidth]{logo.png}%
+
+\textsc{\Large%
+Tutorat \cmdcle@sujet@PASSLAS\\[-4pt]%
+Université Paris Cité\\[5pt]%
+**%
+}%
+
+\vfill%
+
+%%%%%% ue et emoji PASS %%%%%
+\ifthenelse{\cmdcle@sujet@UE = 1}{% 
+\entete%
+    {1}%
+    {Chimie}%
+    {test-tube}}%
+{%
+\ifthenelse{\cmdcle@sujet@UE = 2}{% 
+\entete%
+    {2}%
+    {Biochimie}%
+    {dna}}%
+{%
+\ifthenelse{\cmdcle@sujet@UE = 3}{%
+\entete%
+    {3}%
+    {Biologie Cellulaire}%
+    {microbe}}%
+{%
+\ifthenelse{\cmdcle@sujet@UE = 4}{% 
+\entete%
+    {4}%
+    {Physique}%
+    {star2}}%
+{%
+\ifthenelse{\cmdcle@sujet@UE = 5}{% 
+\entete%
+    {5}%
+    {\resizebox{\linewidth}{!}{Histologie - Embryologie}}%
+    {lungs}}%
+{% 
+\ifthenelse{\cmdcle@sujet@UE = 6}{% 
+\entete%
+    {6}%
+    {Santé Publique}%
+    {hospital}}%
+{% 
+\ifthenelse{\cmdcle@sujet@UE = 7}{% 
+\entete%
+    {7}%
+    {SHS}%
+    {cherry-blossom}}%
+{%
+\ifthenelse{\cmdcle@sujet@UE = 8}{% 
+\entete%
+    {8}%
+    {ICM}%
+    {pill}}%
+{% 
+\ifthenelse{\cmdcle@sujet@UE = 9}{% 
+\entete%
+    {9}%
+    {\resizebox{\linewidth}{!}{Mathématiques - Biostatistiques}}%
+    {triangular-ruler}}%
+{%
+\ifthenelse{\cmdcle@sujet@UE = 10}{% 
+\entete%
+    {10}%
+    {Anatomie}%
+    {anatomical-heart}}%
+{%
+\ifthenelse{\cmdcle@sujet@UE = 11}{% 
+\entete%
+    {11}%
+    {Biophysique}%
+    {radioactive}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{ed}{% 
+\entete%
+    {12}%
+    {SMR}%
+    {stethoscope}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{harma}{% 
+\entete%
+    {12}%
+    {Spé Pharmacie}%
+    {alembic}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{eu}{% 
+\entete%
+    {12}%
+    {Spé Maïeutique}%
+    {teddy-bear}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{donto}{% 
+\entete%
+    {12}%
+    {Spé Odontologie}%
+    {tooth}}%
+{%
+%%%% ECUE des L.AS %%%%%%%
+\IfSubStr{\cmdcle@sujet@UE}{1.1}{%
+\entete%
+    {1.1}%
+    {Chimie}%
+    {test-tube}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{1.2}{%
+\entete%
+    {1.2}%
+    {Biophysique}%
+    {radioactive}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{2.1}{%
+\entete%
+    {2.1}%
+    {Biochimie}%
+    {dna}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{2.2}{%
+\entete%
+    {2.2}%
+    {Biologie Cellulare}%
+    {microbe}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{3.1}{%
+\entete%
+    {3.1}%
+    {\resizebox{.7\linewidth}{!}{\begin{minipage}{\linewidth}\centering Histologie \\ Embryologie \\ Anatomie\end{minipage}}}%
+    {anatomical-heart}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{3.2}{%
+\entete%
+    {3.2}%
+    {ICM}%
+    {pill}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{4.1}{%
+\entete%
+    {4.1}%
+    {SHS}%
+    {cherry-blossom}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{4.2}{%
+\entete%
+    {4.2}%
+    {Santé Publique}%
+    {hospital}}%
+{%
+{\LARGE \color{red} Attention à l'UE que tu as sélectionnée !}%
+}}}}}}}}}}}}}}}}}}}}}}}%
+
+\vfill % 14 accolades
+
+%%%%%% Titre du GT encadré en haut et en bas par des traits pointillés %%%%%%
+\hdashrule{\linewidth}{1.5pt}{3pt}%% trait supérieur
+
+\bigskip\bigskip
+
+\fontsize{24}{24}\selectfont{\bf GT n°\cmdcle@sujet@NumeroDuSupport}%
+
+\bigskip
+
+\fontsize{24}{0}\selectfont{%
+\IfSubStr{\cmdcle@sujet@SujetOuCorrection}    %%% Sujet
+    {ujet}%
+    {Sujet}%
+    {%
+\IfSubStr{\cmdcle@sujet@SujetOuCorrection}   %%% Correction
+    {orrec}%
+    {Correction}%
+    {AIE AIE AIE CORRECTION OU SUJET ?}%
+    }%
+}%
+
+\bigskip\bigskip%
+
+\hdashrule{\linewidth}{1.5pt}{3pt}%
+
+\vfill%
+
+\encadreAsso%
+
+\end{center}%
+
+\newpage%
+
+} % fin rectoGt
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\newcommand{\rectoPoly}
+{%
+\begin{center}%
+\includegraphics[width=.25\linewidth]{logo.png}%
+
+\textsc{\Large%
+Tutorat \cmdcle@sujet@PASSLAS\\[-4pt]%
+Université Paris Cité\\[5pt]%
+**%
+}%
+
+\vfill%
+
+%%%%%% ue et emoji PASS %%%%%
+\ifthenelse{\cmdcle@sujet@UE = 1}{% 
+\entete%
+    {1}%
+    {Chimie}%
+    {test-tube}}%
+{%
+\ifthenelse{\cmdcle@sujet@UE = 2}{% 
+\entete%
+    {2}%
+    {Biochimie}%
+    {dna}}%
+{%
+\ifthenelse{\cmdcle@sujet@UE = 3}{%
+\entete%
+    {3}%
+    {Biologie Cellulaire}%
+    {microbe}}%
+{%
+\ifthenelse{\cmdcle@sujet@UE = 4}{% 
+\entete%
+    {4}%
+    {Physique}%
+    {star2}}%
+{%
+\ifthenelse{\cmdcle@sujet@UE = 5}{% %
+\entete%
+    {5}%
+    {\resizebox{\linewidth}{!}{Histologie - Embryologie}}%
+    {lungs}}%
+{% 
+\ifthenelse{\cmdcle@sujet@UE = 6}{% 
+\entete%
+    {6}%
+    {Santé Publique}%
+    {hospital}}%
+{% 
+\ifthenelse{\cmdcle@sujet@UE = 7}{% 
+\entete%
+    {7}%
+    {SHS}%
+    {cherry-blossom}}%
+{%
+\ifthenelse{\cmdcle@sujet@UE = 8}{% 
+\entete%
+    {8}%
+    {ICM}%
+    {pill}}%
+{% 
+\ifthenelse{\cmdcle@sujet@UE = 9}{% 
+\entete%
+    {9}%
+    {\resizebox{\linewidth}{!}{Mathématiques - Biostatistiques}}%
+    {triangular-ruler}}%
+{%
+\ifthenelse{\cmdcle@sujet@UE = 10}{% 
+\entete%
+    {10}%
+    {Anatomie}%
+    {anatomical-heart}}%
+{%
+\ifthenelse{\cmdcle@sujet@UE = 11}{% 
+\entete%
+    {11}%
+    {Biophysique}%
+    {radioactive}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{ed}{% 
+\entete%
+    {12}%
+    {SMR}%
+    {stethoscope}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{harma}{% 
+\entete%
+    {12}%
+    {Spé Pharmacie}%
+    {alembic}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{eu}{% 
+\entete%
+    {12}%
+    {Spé Maïeutique}%
+    {teddy-bear}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{donto}{% 
+\entete%
+    {12}%
+    {Spé Odontologie}%
+    {tooth}}%
+{%
+%%%% ECUE des L.AS %%%%%%%
+\IfSubStr{\cmdcle@sujet@UE}{1.1}{%
+\entete%
+    {1.1}%
+    {Chimie}%
+    {test-tube}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{1.2}{%
+\entete%
+    {1.2}%
+    {Biophysique}%
+    {radioactive}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{2.1}{%
+\entete%
+    {2.1}%
+    {Biochimie}%
+    {dna}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{2.2}{%
+\entete%
+    {2.2}%
+    {Biologie Cellulare}%
+    {microbe}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{3.1}{%
+\entete%
+    {3.1}%
+    {\resizebox{.7\linewidth}{!}{\begin{minipage}{\linewidth}\centering Histologie \\ Embryologie \\ Anatomie\end{minipage}}}
+    {anatomical-heart}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{3.2}{%
+\entete%
+    {3.2}%
+    {ICM}%
+    {pill}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{4.1}{%
+\entete%
+    {4.1}%
+    {SHS}%
+    {cherry-blossom}}%
+{%
+\IfSubStr{\cmdcle@sujet@UE}{4.2}{%
+\entete%
+    {4.2}%
+    {Santé Publique}%
+    {hospital}}%
+{%
+{\LARGE \color{red} Attention à l'UE que tu as sélectionnée !}%
+}}}}}}}}}}}}}}}}}}}}}}}
+
+\vfill%
+
+%%%%%% Titre du GT encadré en haut et en bas par des traits pointillés %%%%%%
+\hdashrule{\linewidth}{1.5pt}{3pt}%% trait supérieur
+
+\bigskip\bigskip%
+
+
+\IfSubStr{\cmdcle@sujet@Support}%%% Support = Polycopié d'exercices
+    {d'ex}%
+    {{\resizebox{.9\linewidth}{!}{\fontsize{24}{24}\selectfont\bf POLYCOPIÉ D'EXERCICES N°\cmdcle@sujet@NumeroDuSupport}}}%
+    {%
+\IfSubStr{\cmdcle@sujet@Support}%%% Support = Polycopié de QCM
+    {QCM}%
+    {{\fontsize{24}{24}\selectfont\bf POLYCOPIÉ DE QCM N°\cmdcle@sujet@NumeroDuSupport}}%
+    {}%
+    }%
+
+\bigskip%
+
+{%
+\fontsize{24}{0}\selectfont%
+\IfSubStr{\cmdcle@sujet@SujetOuCorrection}%%% Sujet
+    {ujet}%
+    {Sujet}%
+    {%
+\IfSubStr{\cmdcle@sujet@SujetOuCorrection}%%% Correction
+    {orrec}%
+    {Correction}%
+    {AIE AIE AIE CORRECTION OU SUJET ?}%
+    }%
+}%
+
+\bigskip%
+
+\hdashrule{\linewidth}{1.5pt}{3pt}%
+
+\vfill%
+
+\encadreAsso%
+
+\end{center}%
+
+\newpage%
+
+} % fin rectoPoly
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%  Commande de page de couverture \recto   %%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\recto}
+{%
+\thispagestyle{empty}%
+
+\vspace{-.05\textheight}%
+
+\begin{spacing}{1.15}%
+\fontsize{12}{12}\selectfont%
+
+\IfSubStr{\cmdcle@sujet@Support}{uto}%
+    {\rectotuto%
+    \global\def\realisation{Cet examen blanc a été réalisé par :}}%
+{\IfSubStr{\cmdcle@sujet@Support}{oly}%
+    {\rectoPoly%
+    \global\def\realisation{Ce polycopié a été réalisé par :}}%
+{\IfSubStr{\cmdcle@sujet@Support}{GT}%
+    {\rectoGt%
+    \global\def\realisation{Ce GT a été réalisé par :}}%
+{\IfSubStr{\cmdcle@sujet@Support}{ich}%
+    {\rectoFiche%
+    \global\def\realisation{Cette fiche a été réalisée par :}}%
+{\IfSubStr{\cmdcle@sujet@Support}{xtra}%
+    {\rectoExtra%
+    \global\def\realisation{Cet extra a été réalisé par :}}%
+{%
+\begin{center}%
+\Huge \color{red}Veille à bien sélectionner la \textbf{nature du support} !\\[0.5cm]%
+(Tuto, GT, Fiche, Extra, Polycopié d'exercices, Polycopié de QCM)\\[.5cm] %
+Peut-être que le type de support que tu demandes n'existe pas ? N'hésite pas à contacter les LaTeXiens !%
+\end{center}%
+\global\def\realisation{\color{red}N'oublie pas ton recto \emoji{wink}}%
+\newpage%
+}}}}}%
+
+\normalsize%
+\end{spacing}%
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\facebook}[0]{%
+\resizebox{0.185\linewidth}{!}{%
+\begin{tikzpicture}[]%
+\draw[fill={rgb:red,81;green,117;blue,234},rounded corners=10pt] (-1,-1) rectangle (1,1);%
+\draw[color=white, fill=white] (-.15,-1)--++(0,.7)--++(-.2,0)--++(0,.3)--++(.2,0)--++(0,.3) arc(180:90:.3)--++(.3,0)--++(0,-.3) --++(-.1,0) arc(90:180:0.2)--++(0,-.1)--++(.3,0)--++(-.1,-.3)--++(-.2,0)--++(0,-.7)--cycle;%
+\draw (1.1, 0) node [anchor=west]{\Large A2SUP};%
+\end{tikzpicture}%
+}%
+}
+
+
+\newcommand{\instagram}[0]{%
+\resizebox{0.2\linewidth}{!}{%
+\begin{tikzpicture}[]%
+\shade[top color=blue!80!green!50!purple, bottom color=yellow, middle color=red!70!green!50!purple,shading angle=40, rounded corners=10pt](-1,-1) rectangle (1,1);%
+\draw[line width=3pt, color=white, rounded corners =5 pt] (-.7,-.7) rectangle (.7,.7);%
+\draw[line width=3pt, color=white] (0,0) circle (0.35);%
+\draw[line width=3pt, color=white] (.42,.42) circle (0.04);%
+\draw (1.1, 0) node [anchor=west]{\Large @A2SUP};%
+\end{tikzpicture}%
+}%
+}
+
+\newcommand{\twitter}[0]{%
+\resizebox{0.2\linewidth}{!}{%
+\begin{tikzpicture}[]%
+\fill[black, rounded corners=10pt](-1,-1) rectangle (1,1);%
+\draw[line width=2pt, color=white] (-.7,-.7)--(.7,.7);%
+\draw[line width=2pt, color=white, fill=black] (.4,-.6)--++(.2,0)--(-.4,.6)--++(-.2,0)--cycle;%
+\draw[color=black, line width=3pt](-.75,-.69)--++(1.5,0);%
+\draw[color=black, line width=3pt](-.75,.69)--++(1.5,0);%
+\draw (1.1, 0) node [anchor=west]{\Large @A2SUP};%
+\end{tikzpicture}%
+}%
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\newcommand{\verso}{%
+
+\newpage%
+
+\thispagestyle{empty}%
+
+\centering%
+
+\begin{spacing}{1.2}%
+\fontsize{12}{12}\selectfont%
+
+{\large\bf\uline{\realisation}}%
+
+\vfill%
+
+% Rédacteurs, relecteurs, convertisseurs Latex, VP, team, coordinateurs
+{\large\bf Rédacteurs :}\\%
+\cmdcle@sujet@Redacteurs%
+
+\vfill%
+
+
+\ifx\cmdcle@sujet@Relecteurs\empty%
+\relax%
+\else%
+    {\large\bf Relecteurs :}\\%
+	\cmdcle@sujet@Relecteurs%
+
+	\vfill%
+\fi%
+
+%\IfStrEq{\cmdcle@sujet@Relecteurs}{}{}{%
+%{\large\bf Relecteurs :}\\
+%\cmdcle@sujet@Relecteurs
+%
+%\vfill
+%}
+
+\ifx\cmdcle@sujet@ConvertisseursLatex\empty%
+\relax%
+\else%
+    {\large\bf Convertisseurs \LaTeX :}\\%
+	\cmdcle@sujet@ConvertisseursLatex%
+
+	\vfill%
+\fi%
+
+%\IfStrEq{\cmdcle@sujet@ConvertisseursLatex}{}{}{%
+%{\large\bf Convertisseurs \LaTeX :}\\
+%\cmdcle@sujet@ConvertisseursLatex
+%
+%\vfill
+%}
+
+
+\ifx\cmdcle@sujet@TuteursEnSeance\empty%
+\relax%
+\else%
+    {\large\bf Tuteurs en séance :}\\%
+	\cmdcle@sujet@TuteursEnSeance%
+
+	\vfill%
+\fi%
+
+%\IfStrEq{\cmdcle@sujet@TuteursEnSeance}{}{}{%
+%{\large\textbf{Tuteurs en séance :}}\\
+%\cmdcle@sujet@TuteursEnSeance
+%
+%\vfill
+%}
+
+\ifx\cmdcle@sujet@Testeurs\empty%
+\relax%
+\else%
+    {\large\bf Testeurs :}\\%
+	\cmdcle@sujet@Testeurs%
+
+	\vfill%
+\fi%
+
+%\IfStrEq{\cmdcle@sujet@Testeurs}{}{}{%
+%{\large\textbf{Testeurs :}}\\
+%\cmdcle@sujet@Testeurs
+%
+%\vfill
+%}
+
+\textbf{Un grand merci aux VP Tuto \cmdcle@sujet@PASSLAS\ :}\\ %
+\cmdcle@sujet@VP%
+
+\vfill%
+
+Et enfin un immense merci aux tuteurs et tutrices de la team \textbf{\cmdcle@sujet@Team}
+
+\vfill%
+
+\IfSubStr{\cmdcle@sujet@FacRedactionOuCollab}{dact}%
+    {Ce support a été rédigé par l'équipe pédagogique de l'université%
+    \vfill}%
+    {%
+    \IfSubStr{\cmdcle@sujet@FacRedactionOuCollab}{ollab}%
+    {Ce support est proposé en collaboration avec l'équipe pédagogique de l'université%
+    \vfill}%
+    {}}%
+
+\ifx\cmdcle@sujet@ProfDuCours\empty%
+\relax%
+\else%
+    La rédaction a été réalisée à partir du cours de \cmdcle@sujet@ProfDuCours%
+	\vfill%
+\fi%
+
+\ifx\cmdcle@sujet@RemerciementsBonus\empty%
+\relax%
+\else%
+  \cmdcle@Sujet@RemerciementsBonus%
+  \vfill%
+\fi%
+
+\textbf{Sous la coordination de \cmdcle@sujet@Coordinateurs}%
+
+\vfill%
+
+
+%%%%%%% encadré sur la grille, n'apparaît que si support=tuto %%%%%%%%%%
+%\IfSubStr{\cmdcle@sujet@Support}{uto}{
+%{\setlength{\fboxrule}{1pt}
+%\fbox{
+%\begin{minipage}{17cm}
+        
+%    \centering
+%    \vspace*{0.005\textheight}
+%    \textbf{Prenez votre grille en photo avant de la rendre}\\
+%    Votre note et votre classement sont disponibles sur le site \href{www.a2sup.fr}{www.a2sup.fr}\\
+%    Si vous constatez une erreur, envoyez la photo de votre grille sur l'adresse suivante : %\href{mailto:grilles@a2sup.fr}{\textbf{grilles@a2sup.fr}}
+%    \vspace*{0.005\textheight}
+%\end{minipage}
+%}}}{}
+
+% Logo forum 
+\resizebox{.3\linewidth}{!}{%
+\href{https://forum.a2sup.fr}{%
+\begin{minipage}[b]{.3\linewidth}%
+\includegraphics[width=\linewidth]{logo.png}%
+\end{minipage}\hspace{.01\linewidth}%
+\begin{minipage}[b]{.35\linewidth}%
+\resizebox{\linewidth}{!}{forum}%
+\end{minipage}%
+}%
+}%
+
+\medskip%
+
+% Site A2SUP 
+L'A2SUP répond à vos questions sur le forum : \href{https://forum.a2sup.fr}{forum.a2sup.fr}%
+
+\bigskip%
+
+\begin{tcolorbox}[colback=blue!5!white, boxrule=0.5pt, bottom=0pt, top=0pt]%
+\vspace{-.02\textheight}%
+\centering%
+\fcolorbox{black}{pink!20!white}{\large\bf Les règles du forum}%
+
+\begin{tabular}{>{\centering\arraybackslash}m{.3\linewidth}>{\centering\arraybackslash}m{.3\linewidth}>{\centering\arraybackslash}m{.3\linewidth}}%
+\shortstack{\bf \underline{Question de cours} :\\\footnotesize Titre du cours\\\footnotesize Photo/Diapo/Figure/Paragraphe\\\footnotesize Question}%
+&%
+\shortstack{Utiliser la loupe \emoji{mag}\\(en haut à droite)}%
+&%
+\shortstack{\bf \underline{Questions exos/annales} :\\\footnotesize Qxx (ex : Q03)\\[-0.15em]\footnotesize \'Enoncé\\\footnotesize Question}%
+\end{tabular}%
+\end{tcolorbox}%
+
+
+\textbf{L'A2SUP est connectée ! Pour ne rater aucune info :}%
+
+\medskip%
+
+\href{https://www.facebook.com/A2SanteUP/?locale=fr_FR}{\facebook}\hfill%
+\href{https://www.instagram.com/a2sup/}{\instagram}\hfill \href{https://twitter.com/A2SUP}{\twitter}%
+\end{spacing}%
+\normalsize%
+\restoregeometry%
+
+} % fin de \verso
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+% \newcommand*{\mycorrectionlist}{}
+
+
+
+
+
+\tcbset{%
+    itemvrai/.style={%
+        arc=.25pt,%
+        boxrule=.5pt,%
+        colback=white,%
+        top=2pt,%
+        right=0pt,%
+        left=1pt,%
+        bottom=1pt,%
+        before skip balanced=0pt,%
+        after skip balanced=0pt,%
+        parbox=false,%
+        top=0mm,%
+        bottom=0mm,%
+        right=2mm,%
+        left=0mm,%
+        enlarge left by=0mm,%
+        width=\linewidth,%
+    }%
+}%
+
+
+
+
+\newcommand{\itemvrai}[2]{%
+\begin{tcolorbox}[itemvrai]%
+\begin{minipage}{\linewidth}%
+\mathversion{bold}%
+\begin{enumerate}[label=\Alph*.,start=#1, leftmargin=22pt]%
+\bf #2%
+\end{enumerate}%
+\mathversion{normal}%
+\end{minipage}%
+\end{tcolorbox}%
+
+}
+
+
+\newcommand{\itemfaux}[2]{%
+\begin{enumerate}[label=\Alph*., start=#1, leftmargin=25pt]%
+#2%
+\end{enumerate}%
+}
+
+
+
+
+
+
+
+
+
+
+
+\directlua{%
+repertoireDesBilans = {%
+    ABCDE = "\\itemvrai{1}%
+                {%
+                \\item \\argI%
+                \\item \\argII%
+                \\item \\argIII%
+                \\item \\argIV%
+                \\item \\argV%
+                }",%
+    ABCD = "\\itemvrai{1}%
+                {%
+                \\item \\argI%
+                \\item \\argII%
+                \\item \\argIII%
+                \\item \\argIV%
+                }%
+            \\itemfaux{5}%
+                {%
+                \\item \\argV%
+                }",%
+    ABCE = "\\itemvrai{1}%
+                {%
+                \\item \\argI%
+                \\item \\argII%
+                \\item \\argIII%
+                }%
+            \\itemfaux{4}%
+                {%
+                \\item \\argIV%
+                }%
+            \\itemvrai{5}%
+                {%
+                \\item \\argV%
+                }",%
+    ABC = "\\itemvrai{1}%
+                {%
+                \\item \\argI%
+                \\item \\argII%
+                \\item \\argIII%
+                }%
+            \\itemfaux{4}%
+                {%
+                \\item \\argIV%
+                \\item \\argV%
+                }",%
+    ABDE = "\\itemvrai{1}%
+                {%
+                \\item \\argI%
+                \\item \\argII%
+                }%
+            \\itemfaux{3}%
+                {%
+                \\item \\argIII%
+                }%
+            \\itemvrai{4}%
+                {%
+                \\item \\argIV%
+                \\item \\argV%
+                }",%
+    ABD = "\\itemvrai{1}%
+                {%
+                \\item \\argI%
+                \\item \\argII%
+                }%
+            \\itemfaux{3}%
+                {%
+                \\item \\argIII%
+                }%
+            \\itemvrai{4}%
+                {%
+                \\item \\argIV%
+                }%
+            \\itemfaux{5}%
+                {%
+                \\item \\argV%
+                }",%
+    ABE = "\\itemvrai{1}%
+                {%
+                \\item \\argI%
+                \\item \\argII%
+                }%
+            \\itemfaux{3}%
+                {%
+                \\item \\argIII%
+                \\item \\argIV%
+                }%
+            \\itemvrai{5}%
+                {%
+                \\item \\argV%
+                }",%
+    AB = "\\itemvrai{1}%
+                {%
+                \\item \\argI%
+                \\item \\argII%
+                }%
+            \\itemfaux{3}%
+                {%
+                \\item \\argIII%
+                \\item \\argIV%
+                \\item \\argV%
+                }",%
+    ACDE = "\\itemvrai{1}%
+                {%
+                \\item \\argI%
+                }%
+            \\itemfaux{2}%
+                {%
+                \\item \\argII%
+                }%
+            \\itemvrai{3}%
+                {%
+                \\item \\argIII%
+                \\item \\argIV%
+                \\item \\argV%
+                }",%
+    ACD = "\\itemvrai{1}%
+                {%
+                \\item \\argI%
+                }%
+            \\itemfaux{2}%
+                {%
+                \\item \\argII%
+                }%
+            \\itemvrai{3}%
+                {%
+                \\item \\argIII%
+                \\item \\argIV%
+                }%
+            \\itemfaux{5}%
+                {%
+                \\item \\argV%
+                }",%
+    ACE = "\\itemvrai{1}%
+                {%
+                \\item \\argI%
+                }%
+            \\itemfaux{2}%
+                {%
+                \\item \\argII%
+                }%
+            \\itemvrai{3}%
+                {%
+                \\item \\argIII%
+                }%
+            \\itemfaux{4}%
+                {%
+                \\item \\argIV%
+                }%
+            \\itemvrai{5}%
+                {%
+                \\item \\argV%
+                }",%
+    AC = "\\itemvrai{1}%
+                {%
+                \\item \\argI%
+                }%
+            \\itemfaux{2}%
+                {%
+                \\item \\argII%
+                }%
+            \\itemvrai{3}%
+                {%
+                \\item \\argIII%
+                }%
+            \\itemfaux{4}%
+                {%
+                \\item \\argIV%
+                \\item \\argV%
+                }",%
+    ADE = "\\itemvrai{1}%
+                {%
+                \\item \\argI%
+                }%
+            \\itemfaux{2}%
+                {%
+                \\item \\argII%
+                \\item \\argIII%
+                }%
+            \\itemvrai{4}%
+                {%
+                \\item \\argIV%
+                \\item \\argV%
+                }",%
+    AD = "\\itemvrai{1}%
+                {%
+                \\item \\argI%
+                }%
+            \\itemfaux{2}%
+                {%
+                \\item \\argII%
+                \\item \\argIII%
+                }%
+            \\itemvrai{4}%
+                {%
+                \\item \\argIV%
+                }%
+            \\itemfaux{5}%
+                {%
+                \\item \\argV%
+                }",%
+    AE = "\\itemvrai{1}%
+                {%
+                \\item \\argI%
+                }%
+            \\itemfaux{2}%
+                {%
+                \\item \\argII%
+                \\item \\argIII%
+                \\item \\argIV%
+                }%
+            \\itemvrai{5}%
+                {%
+                \\item \\argV%
+                }",%
+    A = "\\itemvrai{1}%
+                {%
+                \\item \\argI%
+                }%
+            \\itemfaux{2}%
+                {%
+                \\item \\argII%
+                \\item \\argIII%
+                \\item \\argIV%
+                \\item \\argV%
+                }",%
+    BCDE = "\\itemfaux{1}%
+                {%
+                \\item \\argI%
+                }%
+            \\itemvrai{2}%
+                {%
+                \\item \\argII%
+                \\item \\argIII%
+                \\item \\argIV%
+                \\item \\argV%
+                }",%
+    BCD = "\\itemfaux{1}%
+                {%
+                \\item \\argI%
+                }%
+            \\itemvrai{2}%
+                {%
+                \\item \\argII%
+                \\item \\argIII%
+                \\item \\argIV%
+                }%
+            \\itemfaux{5}%
+                {%
+                \\item \\argV%
+                }",%
+    BCE = "\\itemfaux{1}%
+                {%
+                \\item \\argI%
+                }%
+            \\itemvrai{2}%
+                {%
+                \\item \\argII%
+                \\item \\argIII%
+                }%
+            \\itemfaux{4}%
+                {%
+                \\item \\argIV%
+                }%
+            \\itemvrai{5}%
+                {%
+                \\item \\argV%
+                }",%
+    BC = "\\itemfaux{1}%
+                {%
+                \\item \\argI%
+                }%
+            \\itemvrai{2}%
+                {%
+                \\item \\argII%
+                \\item \\argIII%
+                }%
+            \\itemfaux{4}%
+                {%
+                \\item \\argIV%
+                \\item \\argV%
+                }",%
+    BDE = "\\itemfaux{1}%
+                {%
+                \\item \\argI%
+                }%
+            \\itemvrai{2}%
+                {%
+                \\item \\argII%
+                }%
+            \\itemfaux{3}%
+                {%
+                \\item \\argIII%
+                }%
+            \\itemvrai{4}%
+                {%
+                \\item \\argIV%
+                \\item \\argV%
+                }",%
+    BD = "\\itemfaux{1}%
+                {%
+                \\item \\argI%
+                }%
+            \\itemvrai{2}%
+                {%
+                \\item \\argII%
+                }%
+            \\itemfaux{3}%
+                {%
+                \\item \\argIII%
+                }%
+            \\itemvrai{4}%
+                {%
+                \\item \\argIV%
+                }%
+            \\itemfaux{5}%
+                {%
+                \\item \\argV%
+                }",%
+    BE = "\\itemfaux{1}%
+                {%
+                \\item \\argI%
+                }%
+            \\itemvrai{2}%
+                {%
+                \\item \\argII%
+                }%
+            \\itemfaux{3}%
+                {%
+                \\item \\argIII%
+                \\item \\argIV%
+                }%
+            \\itemvrai{5}%
+                {%
+                \\item \\argV%
+                }",%
+    B = "\\itemfaux{1}%
+                {%
+                \\item \\argI%
+                }%
+            \\itemvrai{2}%
+                {%
+                \\item \\argII%
+                }%
+            \\itemfaux{3}%
+                {%
+                \\item \\argIII%
+                \\item \\argIV%
+                \\item \\argV%
+                }",%
+    CDE = "\\itemfaux{1}%
+                {%
+                \\item \\argI%
+                \\item \\argII%
+                }%
+            \\itemvrai{3}%
+                {%
+                \\item \\argIII%
+                \\item \\argIV%
+                \\item \\argV%
+                }",%
+    CD = "\\itemfaux{1}%
+                {%
+                \\item \\argI%
+                \\item \\argII%
+                }%
+            \\itemvrai{3}%
+                {%
+                \\item \\argIII%
+                \\item \\argIV%
+                }%
+            \\itemfaux{5}%
+                {%
+                \\item \\argV%
+                }",%
+    CE = "\\itemfaux{1}%
+                {%
+                \\item \\argI%
+                \\item \\argII%
+                }%
+            \\itemvrai{3}%
+                {%
+                \\item \\argIII%
+                }%
+            \\itemfaux{4}%
+                {%
+                \\item \\argIV%
+                }%
+            \\itemvrai{5}%
+                {%
+                \\item \\argV%
+                }",%
+    C = "\\itemfaux{1}%
+                {%
+                \\item \\argI%
+                \\item \\argII%
+                }%
+            \\itemvrai{3}%
+                {%
+                \\item \\argIII%
+                }%
+            \\itemfaux{4}%
+                {%
+                \\item \\argIV%
+                \\item \\argV%
+                }",%
+    DE = "\\itemfaux{1}%
+                {%
+                \\item \\argI%
+                \\item \\argII%
+                \\item \\argIII%
+                }%
+            \\itemvrai{4}%
+                {%
+                \\item \\argIV%
+                \\item \\argV%
+                }",%
+    D = "\\itemfaux{1}%
+                {%
+                \\item \\argI%
+                \\item \\argII%
+                \\item \\argIII%
+                }%
+            \\itemvrai{4}%
+                {%
+                \\item \\argIV%
+                }%
+            \\itemfaux{5}%
+                {%
+                \\item \\argV%
+                }",%
+    E = "\\itemfaux{1}%
+                {%
+                \\item \\argI%
+                \\item \\argII%
+                \\item \\argIII%
+                \\item \\argIV%
+                }%
+            \\itemvrai{5}%
+                {%
+                \\item \\argV%
+                }"%
+}%
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+% Programmation -> La commande finale est \vrai (prend en compte la clé \SujetOuCorrection)
+\newcommand{\vraifaux}[1]
+{%
+\global\def\bilan{#1}%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\directlua{%
+if string.match("\bilan", "A") then
+    if string.match("\bilan", "B") then
+        if string.match("\bilan", "C") then
+            if string.match("\bilan", "D") then
+                if string.match("\bilan", "E") then
+                    tex.print(repertoireDesBilans.ABCDE)
+                    binaire = "11111"
+                    conclusion = "\\vspace{.3cm} Réponses vraies : A, B, C, D et E"
+                else % pas E
+                    tex.print(repertoireDesBilans.ABCD)
+                    binaire = "11110"
+                    conclusion = "\\vspace{.3cm} Réponses vraies : A, B, C et D"
+                end
+            else % pas D
+                if string.match("\bilan", "E") then
+                    tex.print(repertoireDesBilans.ABCE)
+                    binaire = "11101"
+                    conclusion = "\\vspace{.3cm} Réponses vraies : A, B, C et E"
+                else % pas E
+                    tex.print(repertoireDesBilans.ABC)
+                    binaire = "11100"
+                    conclusion = "\\vspace{.3cm} Réponses vraies : A, B et C"
+                end
+            end
+        else % Pas C
+            if string.match("\bilan", "D") then
+                if string.match("\bilan", "E") then
+                    tex.print(repertoireDesBilans.ABDE)
+                    binaire = "11011"
+                    conclusion = "\\vspace{.3cm} Réponses vraies : A, B, D et E"
+                else % pas E
+                    tex.print(repertoireDesBilans.ABD)
+                    binaire = "11010"
+                    conclusion = "\\vspace{.3cm} Réponses vraies : A, B et D"
+                end
+            else % pas D
+                if string.match("\bilan", "E") then
+                    tex.print(repertoireDesBilans.ABE)
+                    binaire = "11001"
+                    conclusion = "\\vspace{.3cm} Réponses vraies : A, B et E"
+                else % pas E
+                    tex.print(repertoireDesBilans.AB)
+                    binaire = "11000"
+                    conclusion = "\\vspace{.3cm} Réponses vraies : A et B"
+                end
+            end
+        end
+    else % Pas B
+        if string.match("\bilan", "C") then
+            if string.match("\bilan", "D") then
+                if string.match("\bilan", "E") then
+                    tex.print(repertoireDesBilans.ACDE)
+                    binaire = "10111"
+                    conclusion = "\\vspace{.3cm} Réponses vraies : A, C, D et E"
+                else % pas E
+                    tex.print(repertoireDesBilans.ACD)
+                    binaire = "10110"
+                    conclusion = "\\vspace{.3cm} Réponses vraies : A, C et D"
+                end
+            else % pas D
+                if string.match("\bilan", "E") then
+                    tex.print(repertoireDesBilans.ACE)
+                    binaire = "10101"
+                    conclusion = "\\vspace{.3cm} Réponses vraies : A, C, et E"
+                else % pas E
+                    tex.print(repertoireDesBilans.AC)
+                    binaire = "10100"
+                    conclusion = "\\vspace{.3cm} Réponses vraies : A et C"
+                end
+            end
+        else % Pas C
+            if string.match("\bilan", "D") then
+                if string.match("\bilan", "E") then
+                    tex.print(repertoireDesBilans.ADE)
+                    binaire = "10011"
+                    conclusion = "\\vspace{.3cm} Réponses vraies : A, D et E"
+                else % pas E
+                    tex.print(repertoireDesBilans.AD)
+                    binaire = "10010"
+                    conclusion = "\\vspace{.3cm} Réponses vraies : A et D"
+                end
+            else % pas D
+                if string.match("\bilan", "E") then
+                    tex.print(repertoireDesBilans.AE)
+                    binaire = "10001"
+                    conclusion = "\\vspace{.3cm} Réponses vraies : A et E"
+                else % pas E
+                    tex.print(repertoireDesBilans.A)
+                    binaire = "10000"
+                    conclusion = "\\vspace{.3cm} Réponse vraie : A"
+                end
+            end
+        end
+    end
+else % Pas A
+    if string.match("\bilan", "B") then
+        if string.match("\bilan", "C") then
+            if string.match("\bilan", "D") then
+                if string.match("\bilan", "E") then
+                    tex.print(repertoireDesBilans.BCDE)
+                    binaire = "01111"
+                    conclusion = "\\vspace{.3cm} Réponses vraies : B, C, D et E"
+                else % pas E
+                    tex.print(repertoireDesBilans.BCD)
+                    binaire = "01110"
+                    conclusion = "\\vspace{.3cm} Réponses vraies : B, C et D"
+                end
+            else % pas D
+                if string.match("\bilan", "E") then
+                    tex.print(repertoireDesBilans.BCE)
+                    binaire = "01101"
+                    conclusion = "\\vspace{.3cm} Réponses vraies : B, C et E"
+                else % pas E
+                    tex.print(repertoireDesBilans.BC)
+                    binaire = "01100"
+                    conclusion = "\\vspace{.3cm} Réponses vraies : B et C"
+                end
+            end
+        else % Pas C
+            if string.match("\bilan", "D") then
+                if string.match("\bilan", "E") then
+                    tex.print(repertoireDesBilans.BDE)
+                    binaire = "01011"
+                    conclusion = "\\vspace{.3cm} Réponses vraies : B, D et E"
+                else % pas E
+                    tex.print(repertoireDesBilans.BD)
+                    binaire = "01010"
+                    conclusion = "\\vspace{.3cm} Réponses vraies : B et D"
+                end
+            else % pas D
+                if string.match("\bilan", "E") then
+                    tex.print(repertoireDesBilans.BE)
+                    binaire = "01001"
+                    conclusion = "\\vspace{.3cm} Réponses vraies : B et E"
+                else % pas E
+                    tex.print(repertoireDesBilans.B)
+                    binaire = "01000"
+                    conclusion = "\\vspace{.3cm} Réponse vraie : B"
+                end
+            end
+        end
+    else % Pas B
+        if string.match("\bilan", "C") then
+            if string.match("\bilan", "D") then
+                if string.match("\bilan", "E") then
+                    tex.print(repertoireDesBilans.CDE)
+                    binaire = "00111"
+                    conclusion = "\\vspace{.3cm} Réponses vraies : C, D et E"
+                else % pas E
+                    tex.print(repertoireDesBilans.CD)
+                    binaire = "00110"
+                    conclusion = "\\vspace{.3cm} Réponses vraies : C et D"
+                end
+            else % pas D
+                if string.match("\bilan", "E") then
+                    tex.print(repertoireDesBilans.CE)
+                    binaire = "00101"
+                    conclusion = "\\vspace{.3cm} Réponses vraies : C et E"
+                else % pas E
+                    tex.print(repertoireDesBilans.C)
+                    binaire = "00100"
+                    conclusion = "\\vspace{.3cm} Réponse vraie : C"
+                end
+            end
+        else % Pas C
+            if string.match("\bilan", "D") then
+                if string.match("\bilan", "E") then
+                    tex.print(repertoireDesBilans.DE)
+                    binaire = "00011"
+                    conclusion = "\\vspace{.3cm} Réponses vraies : D et E"
+                else % pas E
+                    tex.print(repertoireDesBilans.D)
+                    binaire = "00010"
+                    conclusion = "\\vspace{.3cm} Réponse vraie : D"
+                end
+            else % pas D
+                if string.match("\bilan", "E") then
+                    tex.print(repertoireDesBilans.E)
+                    binaire = "00001"
+                    conclusion = "\\vspace{.3cm} Réponse vraie : E"
+                else % pas E
+                    tex.print("")
+                    conclusion = ""
+                end
+            end
+        end
+    end
+end
+}
+
+% %% fin de la minipage ouverte dans \question
+ \end{minipage}                             %
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% \edef\mycorrectionlist{\mycorrectionlist\itemA\itemB\itemC\itemD\itemE}
+
+\directlua{
+f=io.open("grille.aux","a")
+f:write(binaire.."\\\\")%"\itemA\itemB\itemC\itemD\itemE\\\\")
+f:close()
+}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\newcommand{\vrai}[1]{%
+\IfSubStr{\cmdcle@sujet@SujetOuCorrection}{orrec}%
+    {\vraifaux{#1}}%
+    {\end{minipage}}%
+
+\separationVariable%
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\def\fondcorrection{gray!8!white}
+
+
+% \newenvironment{mymdframed}[1]
+%   {\mdfsetup{
+%     frametitle={\fcolorbox{black}{gray!20!white}{Correction -- question \numquestioncorrection}},
+%     innertopmargin=0pt,
+%     frametitleaboveskip=-\ht\strutbox,
+%     frametitlealignment=\raggedleft,
+%     everyline=true,
+%     backgroundcolor=\fondcorrection
+%     }
+%   \begin{mdframed}%
+%   }
+%   {\end{mdframed}}
+
+
+
+
+\newcounter{numcorrectionitem} % pour \correctionitem{}
+
+
+
+\tcbset{%
+    correction/.style={%
+        enhanced,%
+        attach boxed title to top right={xshift=0cm,yshift=-2mm},%
+        colback=black!2!white,%
+        boxrule=.5pt,%
+        colframe=black,%
+        coltitle=black,%
+        colbacktitle=black!15!white,%
+        title=\bf Correction -- Question \numquestioncorrection,%
+        attach boxed title to top right={xshift=-0.5cm,yshift=-.25cm},%
+        boxed title style={boxrule=0.6pt},%
+        breakable,%
+        top=3mm,%
+        bottom=0mm,%
+        right=1mm,%
+        left=1mm,%
+        enlarge left by=-2mm,%
+        width=\linewidth-2\fboxrule-2\fboxsep+20pt%
+    }%
+}%
+
+
+
+
+\newcommand{\correction}[1]
+{%
+\IfSubStr{\cmdcle@sujet@SujetOuCorrection}{orre}{%
+
+\setcounter{numcorrectionitem}{0}%
+
+% \begin{mdframed}[
+%     everyline=true,
+%     backgroundcolor=\fondcorrection
+%     ]
+\begin{tcolorbox}[correction]%
+% \vspace{-.5cm}
+% \begin{flushright}
+%     \begin{tikzpicture}
+%     \draw (0,0) node{\fcolorbox{black}{gray!20!white}{\space \textbf{Correction -- question \numquestioncorrection}\space}};
+% \end{tikzpicture}
+% \end{flushright}
+
+#1%
+
+\specificiteSecondeQuestionIsolee% voir \informations
+
+{\bf\directlua{tex.print(conclusion)}}%
+
+% \end{mdframed}
+\end{tcolorbox}%
+}{}%
+
+\vspace{.5cm}%
+
+{}%
+}% commande de correction
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+% Boite pour ajouter des points importants dans les corrections
+\newcommand{\boite}[3]
+{%
+\begin{center}%
+\begin{mdframed}[userdefinedwidth=.8\linewidth,%
+align=center,%
+topline=true,%
+  rightline=true,%
+  bottomline=true,%
+  leftmargin=0pt,%
+  skipabove=0pt,%
+  skipbelow=0,%
+  shadow=true,%
+  backgroundcolor=gray!20!white,%
+  frametitleaboveskip=\ht\strutbox,%
+  innertopmargin=5pt,%
+  frametitle={%
+  \begin{minipage}{.5cm}%
+    \resizebox{.5cm}{!}{#1}%
+    \end{minipage}\quad%
+    \begin{minipage}{\linewidth-1cm}%
+        #2%
+    \end{minipage}%
+  }]%
+  
+#3%
+
+\end{mdframed}%
+\end{center}%
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\def\emojicorrectionitem{\bcquestion}%
+
+\newlength{\longueurintroitem}%
+
+
+% Introduction des items corrigés
+% correctionitem{Items A et B}
+\newcommand{\correctionitem}[1]%
+{%
+% \addtocounter{numcorrectionitem}{1}% = 1 s'il s'agit du (des) premier(s) item(s) corrigé(s)
+\stepcounter{numcorrectionitem}%
+
+\renewcommand{\emojicorrectionitem}{\bcquestion}%
+
+\specificitePremiereQuestionIsolee%
+
+
+\directlua{%
+liste="ABCDE"
+for item in liste:gmatch"." do
+    if string.find("#1", "tem "..item) then
+        if string.find("\bilan", item) then
+            token.set_macro("emojicorrectionitem", "\\color{green!50!black}\\checkmark")
+        else
+            token.set_macro("emojicorrectionitem", "\\emoji{x}")
+        end
+        break
+    end
+end
+
+
+
+if "\thenumcorrectionitem"=="1" then
+    tex.print("\\medskip")
+else
+    tex.print("\\bigskip")
+end
+}
+
+
+\hspace{-18pt}%
+\begin{minipage}{.5cm}%
+    \fcolorbox{black}{\fondcorrection}%
+        {%
+        \resizebox{.6cm}{!}{\emojicorrectionitem}%
+        }%
+\end{minipage}%
+\hspace{18pt}%
+\begin{minipage}{4cm}%
+    \bf\underline{#1}%
+\end{minipage}%
+
+\medskip%
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+% Introduction d'une page vide
+\newcommand{\pagevide}
+{%
+	\newpage%
+	\mbox{}%
+	\newpage%
+}
+
+
+
+% Introduction d'une page vide pour le sujet
+\newcommand{\pagevidesujet}
+{%
+\IfSubStr{\cmdcle@sujet@SujetOuCorrection}%
+    {ujet}%
+    {\pagevide}%
+}
+
+
+
+% Introduction d'une page vide pour la correction
+\newcommand{\pagevidecorrection}
+{%
+\IfSubStr{\cmdcle@sujet@SujetOuCorrection}%
+    {orrec}%
+    {\pagevide}%
+}
+
+
+
+\newcommand{\dansSujet}[1]
+{%
+\IfSubStr{\cmdcle@sujet@SujetOuCorrection}%
+    {uje}%
+    {#1}%
+
+}
+
+
+\newcommand{\dansCorrection}[1]
+{%
+\IfSubStr{\cmdcle@sujet@SujetOuCorrection}%
+    {orrec}%
+    {#1}%
+
+}
+
+
+
+
+\def\separationVariable{} % initialisation
+
+\newcommand{\inseparable}[0]{%
+\def\separationVariable{%
+    \end{minipage}%pour automatiquement fermer minipage
+    \def\separationVariable{}%pour réinitialiser son contenu
+}%
+\begin{minipage}{\linewidth}%ouvre minipage, qui sera automatiquement fermé par le système juste ci-dessus
+}
+
+
+
+
+\newcommand{\optimisation}{%
+\directlua{
+listeBilan = {}
+local logfilename = "grille.aux"
+local file = io.open(logfilename, "r")
+}%
+
+\directlua{
+f=io.open("grille.aux","w")
+f:write("")
+f:close()
+}%
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\newcommand{\exercice}[1]{%
+\newpage%
+
+\begin{center}%
+\bf \LARGE #1%
+\end{center}%
+
+\vspace{.25cm}%
+
+}
+
+
+
+\newcommand{\titre}[1]{%
+\newpage%
+
+\begin{center}%
+\bf \LARGE #1%
+\end{center}%
+
+\vspace{1cm}%
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%%%%%%%% Numérotation automatique des questions (pour vérification)
+% \newcounter{numqst}
+% \setcounter{numqst}{0}
+%%%%% Actuellement désactivé car pas d'intérêt majeur
+
+\newcommand{\mesitems}[1]{%Utile pour la correction des items qui sont isolés (l'option CorrectionItemIsole est donc activée, actuellement pour l'histo et la SP PASS).
+% Processing pour sélectionner le bon item
+\IfSubStr{#1}{1}%
+    {\def\monitem{\argI}}%
+    {%
+    \IfSubStr{#1}{2}%
+        {\def\monitem{\argII}}%
+        {%
+        \IfSubStr{#1}{3}%
+            {\def\monitem{\argIII}}%
+            {%
+            \IfSubStr{#1}{4}%
+                {\def\monitem{\argIV}}%
+                {\def\monitem{\argV}}%
+            }%
+        }%
+    }
+%affiche finalement l'item concerné
+\monitem%
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+% Introduction d'une question et de son énoncé
+% \question{1}{Enonce de la question}{Item A}{Item B}{Item C}{Item D}{Item E}
+\newcommand{\question}[7]
+{%
+    %\addtocounter{numqst}{1} % Incrémentation pour numération automatique (pas d'intérêt actuellement)
+    \global\def\numquestioncorrection{#1}%
+    
+    \begin{minipage}{\linewidth}%
+	\vspace{.5cm}%
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%  MEP Enoncé question  %%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%
+    \MEPquestion{#1}{#2}%
+    
+    \leftskip=0cm%
+    
+	\medskip%
+
+    \IfSubStr{\cmdcle@sujet@SujetOuCorrection}{ujet}{% Si sujet
+    \begin{enumerate}[label=\Alph*.]%
+		\leftskip=\indentationitemsujet%
+		\item #3%
+		\item #4%
+		\item #5%
+		\item #6%
+		\item #7%
+	\end{enumerate}%
+    
+    \vspace{0.5cm}%
+    
+    }{%
+    \global\def\bilan{} % réinitialisation
+
+    % Utiles pour exploiter les items dans d'autres commandes, comme \mesitems et \vraifaux
+    \global\def\argI{{#3}}%
+    \global\def\argII{{#4}}%
+    \global\def\argIII{{#5}}%
+    \global\def\argIV{{#6}}%
+    \global\def\argV{{#7}}%
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\newcommand{\questionsansitem}[2]
+{%
+%\addtocounter{numqst}{1} % Incrémentation pour numération automatique
+    \global\def\numquestioncorrection{#1}%
+
+    \global\def\bilan{}%
+    
+	\vspace{.5cm}%
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%  MEP Enoncé question  %%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%
+    \MEPquestion{#1}{#2}%
+    
+    \leftskip=0cm%
+    
+	\medskip%
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+% Introduction d'une question, de son énoncé, accompagné d'aides au calcul, et des 5 items
+% \questionavecaide{num question}{énoncé}{aide}{A}{B}{C}{D}{E}
+\newcommand{\questionavecaide}[8]
+{%
+    %\addtocounter{numqst}{1} % Incrémentation pour numérotation automatique
+    \global\def\numquestioncorrection{#1}%
+    
+    \begin{minipage}{\linewidth}%
+	\vspace{.5cm}%
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%  MEP Enoncé question  %%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%
+    \MEPquestion{#1}{#2}%
+
+    \leftskip=0cm%
+    
+	\medskip%
+
+    \leftskip=2.5em %
+	
+    \textit{Aide aux calculs : #3}\\[-7pt]%
+    
+    \leftskip=0em %
+    
+    \IfSubStr{\cmdcle@sujet@SujetOuCorrection}{ujet}{% Si sujet
+    \begin{enumerate}[label=\Alph*.] %
+		\leftskip=\indentationitemsujet%
+		\item #4%
+		\item #5%
+		\item #6%
+		\item #7%
+		\item #8%
+	\end{enumerate}%
+    
+    \vspace{0.5cm}%
+    
+    }{%
+    \global\def\bilan{}%
+
+    \global\def\argI{{#4}}%
+    \global\def\argII{{#5}}%
+    \global\def\argIII{{#6}}%
+    \global\def\argIV{{#7}}%
+    \global\def\argV{{#8}}%
+    }%
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%%%%%%%%% pour l'ancienne commande de grille, pas très optimisée
+% % Commande pour colorier une case
+% \newcommand{\case}[1]
+% {%
+% \foreach \item in {1,...,5}
+%     {%
+%     \pgfmathtruncatemacro{\resultat}{5*(\qst-1)+\item}
+
+%     \StrChar{\mycorrectionlist}{\resultat}[\charvalue]
+
+%     \ifnum\charvalue=1
+%         \draw[fill=black, xshift=16*\item+16*\shift*(#1-1)+.1cm] (0,-46*\qst+46*12*#1-46*12pt+.97cm) rectangle +(.25,.3);
+%     \else
+%     % L'item est faux, on ne fait rien.
+%     \fi
+%     }
+% }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\newcommand{\grillealpha}{%
+%%%% Spécifique au remplissage de la grille
+%%% Ouverture du fichier grille.aux, afin d'en extraire les bilans
+\directlua{
+listeBilan = {}
+local logfilename = "grille.aux"
+local file = io.open(logfilename, "r")
+
+if file then
+    local content = file:read("*all")
+    file:close()
+
+    for line in content:gmatch("(.-)\\\\") do
+        local sousListe = {}
+        for i = 1, 5 do
+            table.insert(sousListe, line:sub(i, i))
+        end
+        table.insert(listeBilan, sousListe)
+    end
+else
+    tex.print("\\PackageError{A2SUP}{Problème de fichier auxiliaire}{Il y a un problème dans la création ou la gestion du fichier grille.aux. N'hésite pas à contacter les LaTeXiens pour trouver la solution !}")
+end
+}%
+
+
+
+%%%%% Réinitialisation du fichier après l'avoir exploité
+\directlua{
+f=io.open("grille.aux","w")
+f:write("")
+f:close()
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newpage%
+\sffamily%
+\vspace*{-3.5cm}
+\resizebox{!}{\paperheight}{%
+\begin{tikzpicture}
+    %%%%%%% logo a2sup %%%%%%%%%%%%%%
+    \node at (-6.8, 1.7) {\includegraphics[width=3.6cm]{logo.png}};
+    %%%%%%% upc a2sup tuto %%%%%%%%%%%%%%
+    \node at (-1.6, 2.6) {%
+        \begin{minipage}{6cm}
+            \vspace*{2.15cm}
+            \fontsize{20}{24}\selectfont{%
+            Université Paris Cité \\ A2SUP - Tutorat
+            }
+        \end{minipage}
+    };
+
+
+    %%%%%%% nom prénom numéro a2sup %%%%%%%%%%%%%%
+    \node at (3.75, 1.95) {%
+        \begin{minipage}{5cm}
+            \vspace*{2.18cm}
+            \fontsize{12}{13.5}\selectfont
+            \noindent
+                Nom : Mbappé\\
+                Prénom : Kylian\\
+                Numéro A2SUP : 06 38 58...\\
+            \vspace*{0.8cm}
+        \end{minipage}
+                        };
+
+
+    %%%% encadré rouge + son contenu + trait rouge du dessus avec tuto/ue(spé)  %%%%%
+
+    %%%%%%% trait du dessus + node %%%%%%%%%%%%%%
+    \draw [color=red, line width=1pt] (1.23, 2.6) -- (8.5, 2.6); % trait du dessus
+        
+    \fontsize{9}{9}\selectfont{
+    \node[anchor=west] at (1.2, 2.9) {Tuto n° : \cmdcle@sujet@NumeroDuSupport};
+        
+    % Indication de l'UE (spé)
+
+    \directlua{
+    if string.match("\cmdcle@sujet@UE", "12") then
+        if string.match("\cmdcle@sujet@UE", "med") then
+            tex.print("\\node[anchor=west] at (4.6,2.9) {UE (spé) : SMR};")
+        elseif string.match("\cmdcle@sujet@UE", "dont") then
+            tex.print("\\node[anchor=west] at (4.6,2.9) {UE (spé) : Odontologie};")
+        elseif string.match("\cmdcle@sujet@UE", "eu") then
+             tex.print("\\node[anchor=west] at (4.6,2.9) {UE (spé) : Maïeutique};")
+        elseif string.match("\cmdcle@sujet@UE", "harm") then
+            tex.print("\\node[anchor=west] at (4.6,2.9) {UE (spé) : Pharmacie};")
+        else
+            tex.print("\\erreurUE{version AZNJD}")
+        end
+    else
+        tex.print("\\node[anchor=west] at (4.6,2.9) {UE (spé) : \cmdcle@sujet@UE};")
+    end
+    }
+        
+    }%fin de selectfontttt
+    %%%%%%% "numéro a2sup" %%%%%%%%%%%%%%
+    \node at (-7.75, -1.4) {%
+            \begin{minipage}{2cm}
+            \centering
+            \fontsize{8}{9}\selectfont Numéro \\ A2SUP
+            \end{minipage}
+                            };
+            
+    %%%%%%% flèche sens de remplissage %%%%%%%%%%%%%%
+    \draw[very thick, -{stealth}] (-7, -0.5) -- (-7, -2.25);
+
+    %%%%%%% carrés n°a2sup + légendes + chiffres %%%%%%%%%%%%%%
+    \node at (-6.75, -1.35){
+            \begin{minipage}{2cm}
+            \raggedleft
+                \setstretch{1.25}
+                \fontsize{8}{9}\selectfont 
+                Diz. Mil. \\ Mil. \\ Cent. \\ Diz. \\ Unit.
+            \end{minipage}
+                            };
+    % carrés numéro a2sup
+    \directlua{
+    for colonne = 0, 9 do
+        tex.print("\\node[xshift="..13*colonne.."] at (-5.45,-.25) {\\color{red}\\fontsize{8}{9}\\selectfont{"..colonne.."}};")
+        for ligne = 0, 4 do
+            tex.print("\\node at (-5.45,-.6)[draw, thick,rectangle,minimum width=.25cm,minimum height=.3cm, xshift="..13*colonne..", yshift="..-11*ligne.."] {};")
+        end
+    end
+    }
+
+        
+    %%%%%%% carrés date de naissance + contrôle + légende + chiffres %%%%%%%%%%%%%%
+    \node at (1, -1.1){%
+        \begin{minipage}{2cm}
+            \raggedleft
+            \setstretch{1.15}
+            \fontsize{8}{9}\selectfont{
+            Contrôle}
+        \end{minipage}};
+
+    \node at (2.25, -1.2){
+        \begin{minipage}{2cm}
+            \raggedleft
+            \setstretch{1.15}
+            \fontsize{8}{9}\selectfont{
+            J diz. \\ J unit. \\ M diz. \\ M unit.}
+        \end{minipage}};
+
+    \directlua{
+    for colonne = 0, 9 do
+        tex.print("\\node[xshift="..13*colonne.."] at (3.55,-.25) {\\color{red}\\fontsize{8}{9}\\selectfont{"..colonne.."}};")
+        for ligne = 0, 3 do
+            tex.print("\\node at (3.55,-.6)[draw, thick,rectangle,minimum width=.25cm,minimum height=.3cm, xshift="..13*colonne..", yshift="..-11*ligne.."] {};")
+        end
+    end
+    }
+        
+    \node at (5.7, -2.17) {\fontsize{8}{9}\selectfont{Date de naissance (JJ/MM)}};
+
+    %%%%%%% ligne id + encadré rouge %%%%%%%%%%%%%%
+    \draw [line width=0.12cm, color=black!80] (-8.5, 0.2) -- (8.5, 0.2); %ligne "identification"
+    \node at (0, 0.2) {%
+        \colorbox{white}{\textbf{\fontsize{8}{9}\selectfont\space IDENTIFICATION \space}}
+                    }; %texte "IDENTIFICATION"
+    \draw [color=red, line width=1pt] (-8.5, -2.45) rectangle (8.5, 0.4); % encadré rouge 
+
+    %%%% partie de l'aigri %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    \begin{scope}[xshift=-241.9pt, yshift=-80pt]
+    \directlua{
+    for case = 1,45 do
+        vcoeff = 46
+        hcoeff = 129
+        if case < 13 then
+            vespacement = vcoeff*(case-1)
+            hespacement = 0
+        elseif case < 25 then
+            vespacement = vcoeff*(case-13)
+            hespacement = hcoeff
+        elseif case < 37 then
+            vespacement = vcoeff*(case-25)
+            hespacement = hcoeff*2
+        else
+            vespacement = vcoeff*(case-37)
+            hespacement = hcoeff*3
+        end
+
+        
+        tex.print("\\begin{scope}[xshift="..hespacement..", yshift="..-vespacement.."-.2125cm]")
+        tex.print("\\draw[thick] (96.7pt,-39.9pt) rectangle (0, 0) node[anchor=north west]{\\textbf{".. case .."}};")
+            
+        item = {"A","B","C","D","E"}
+            
+        for colonne = 1,5 do
+            tex.print("\\node[xshift="..-16*(colonne-1).."] at (86.8pt,-20pt) {\\textbf{"..item[6-colonne].."}};")
+            for ligne = 0,1 do
+                % Remplissage
+                if (ligne == 0 and listeBilan[case] and listeBilan[case][colonne] and listeBilan[case][6-colonne] == "1") then
+                    coloriage = ", fill=black"
+                else
+                    coloriage = ""
+                end
+                % fin de remplissage
+                tex.print("\\node at (90.3pt,-3.2pt)[draw, thick, rectangle, minimum width=7pt, minimum height=8.5pt, xshift="..-16*(colonne-1)..", yshift="..-24*ligne..", anchor=north east"..coloriage.."] {};")
+            end
+        end
+        tex.print("\\end{scope}")
+    end
+    }
+    \end{scope}
+\end{tikzpicture}
+} % fin de la resizebox 
+\normalsize
+\normalfont
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\newcommand{\grillevierge}{%
+
+
+%%%% Spécifique au remplissage de la grille
+%%% Ouverture du fichier grille.aux, afin d'en extraire les bilans
+\directlua{
+listeBilan = {}
+local logfilename = "grille.aux"
+local file = io.open(logfilename, "r")
+
+if file then
+    local content = file:read("*all")
+    file:close()
+
+    for line in content:gmatch("(.-)\\\\") do
+        local sousListe = {}
+        for i = 1, 5 do
+            table.insert(sousListe, line:sub(i, i))
+        end
+        table.insert(listeBilan, sousListe)
+    end
+else
+    tex.print("\\PackageError{A2SUP}{Problème de fichier auxiliaire}{Il y a un problème dans la création ou la gestion du fichier grille.aux. N'hésite pas à contacter les LaTeXiens pour trouver la solution !}")
+end
+}
+
+
+
+%%%%% Réinitialisation du fichier après l'avoir exploité
+\directlua{
+f=io.open("grille.aux","w")
+f:write("")
+f:close()
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+\newpage
+\sffamily
+\vspace*{-3.5cm}
+\resizebox{!}{\paperheight}{%
+\begin{tikzpicture}
+    %%%%%%% logo a2sup %%%%%%%%%%%%%%
+    \node at (-6.8, 1.7) {\includegraphics[width=3.6cm]{logo.png}};
+    %%%%%%% upc a2sup tuto %%%%%%%%%%%%%%
+    \node at (-1.6, 2.6) {%
+        \begin{minipage}{6cm}
+            \vspace*{2.15cm}
+            \fontsize{20}{24}\selectfont{%
+            Université Paris Cité \\ A2SUP - Tutorat
+            }
+        \end{minipage}
+    };
+
+
+    %%%%%%% nom prénom numéro a2sup %%%%%%%%%%%%%%
+    \node at (3.75, 1.95) {%
+        \begin{minipage}{5cm}
+            \vspace*{2.18cm}
+            \fontsize{12}{13.5}\selectfont
+            \noindent
+                Nom :\\
+                Prénom :\\
+                Numéro A2SUP :\\
+            \vspace*{0.8cm}
+        \end{minipage}
+                        };
+
+
+    %%%%%%%%% encadré rouge + son contenu + trait rouge du dessus avec tuto/ue(spé)  %%%%%%%%
+
+    %%%%%%% trait du dessus + node %%%%%%%%%%%%%%
+    \draw [color=red, line width=1pt] (1.23, 2.6) -- (8.5, 2.6); % trait du dessus
+        
+    \fontsize{9}{9}\selectfont{
+    \node[anchor=west] at (1.2, 2.9) {Tuto n° : \cmdcle@sujet@NumeroDuSupport};
+        
+    % Indication de l'UE (spé)
+
+    \directlua{
+    if string.match("\cmdcle@sujet@UE", "12") then
+        if string.match("\cmdcle@sujet@UE", "med") then
+            tex.print("\\node[anchor=west] at (4.6,2.9) {UE (spé) : SMR};")
+        elseif string.match("\cmdcle@sujet@UE", "dont") then
+            tex.print("\\node[anchor=west] at (4.6,2.9) {UE (spé) : Odontologie};")
+        elseif string.match("\cmdcle@sujet@UE", "eu") then
+             tex.print("\\node[anchor=west] at (4.6,2.9) {UE (spé) : Maïeutique};")
+        elseif string.match("\cmdcle@sujet@UE", "harm") then
+            tex.print("\\node[anchor=west] at (4.6,2.9) {UE (spé) : Pharmacie};")
+        else
+            tex.print("\\erreurUE{version AZNJD}")
+        end
+    else
+        tex.print("\\node[anchor=west] at (4.6,2.9) {UE (spé) : \cmdcle@sujet@UE};")
+    end
+    }
+        
+    }%fin de selectfontttt
+    %%%%%%% "numéro a2sup" %%%%%%%%%%%%%%
+    \node at (-7.75, -1.4) {%
+            \begin{minipage}{2cm}
+            \centering
+            \fontsize{8}{9}\selectfont Numéro \\ A2SUP
+            \end{minipage}
+                            };
+            
+    %%%%%%% flèche sens de remplissage %%%%%%%%%%%%%%
+    \draw[very thick, -{stealth}] (-7, -0.5) -- (-7, -2.25);
+
+    %%%%%%% carrés n°a2sup + légendes + chiffres %%%%%%%%%%%%%%
+    \node at (-6.75, -1.35){
+            \begin{minipage}{2cm}
+            \raggedleft
+                \setstretch{1.25}
+                \fontsize{8}{9}\selectfont 
+                Diz. Mil. \\ Mil. \\ Cent. \\ Diz. \\ Unit.
+            \end{minipage}
+                            };
+    % carrés numéro a2sup
+    \directlua{
+    for colonne = 0, 9 do
+        tex.print("\\node[xshift="..13*colonne.."] at (-5.45,-.25) {\\color{red}\\fontsize{8}{9}\\selectfont{"..colonne.."}};")
+        for ligne = 0, 4 do
+            tex.print("\\node at (-5.45,-.6)[draw, thick,rectangle,minimum width=.25cm,minimum height=.3cm, xshift="..13*colonne..", yshift="..-11*ligne.."] {};")
+        end
+    end
+    }
+
+        
+    %%%%%%% carrés date de naissance + contrôle + légende + chiffres %%%%%%%%%%%%%%
+    \node at (1, -1.1){%
+        \begin{minipage}{2cm}
+            \raggedleft
+            \setstretch{1.15}
+            \fontsize{8}{9}\selectfont{
+            Contrôle}
+        \end{minipage}};
+
+    \node at (2.25, -1.2){
+        \begin{minipage}{2cm}
+            \raggedleft
+            \setstretch{1.15}
+            \fontsize{8}{9}\selectfont{
+            J diz. \\ J unit. \\ M diz. \\ M unit.}
+        \end{minipage}};
+
+    \directlua{
+    for colonne = 0, 9 do
+        tex.print("\\node[xshift="..13*colonne.."] at (3.55,-.25) {\\color{red}\\fontsize{8}{9}\\selectfont{"..colonne.."}};")
+        for ligne = 0, 3 do
+            tex.print("\\node at (3.55,-.6)[draw, thick,rectangle,minimum width=.25cm,minimum height=.3cm, xshift="..13*colonne..", yshift="..-11*ligne.."] {};")
+        end
+    end
+    }
+        
+    \node at (5.7, -2.17) {\fontsize{8}{9}\selectfont{Date de naissance (JJ/MM)}};
+
+    %%%%%%% ligne id + encadré rouge %%%%%%%%%%%%%%
+    \draw [line width=0.12cm, color=black!80] (-8.5, 0.2) -- (8.5, 0.2); %ligne "identification"
+    \node at (0, 0.2) {%
+        \colorbox{white}{\textbf{\fontsize{8}{9}\selectfont\space IDENTIFICATION \space}}
+                    }; %texte "IDENTIFICATION"
+    \draw [color=red, line width=1pt] (-8.5, -2.45) rectangle (8.5, 0.4); % encadré rouge 
+
+    %%%% partie de l'aigri %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    \begin{scope}[xshift=-241.9pt, yshift=-80pt]
+    \directlua{
+    for case = 1,45 do
+        vcoeff = 46
+        hcoeff = 129
+        if case < 13 then
+            vespacement = vcoeff*(case-1)
+            hespacement = 0
+        elseif case < 25 then
+            vespacement = vcoeff*(case-13)
+            hespacement = hcoeff
+        elseif case < 37 then
+            vespacement = vcoeff*(case-25)
+            hespacement = hcoeff*2
+        else
+            vespacement = vcoeff*(case-37)
+            hespacement = hcoeff*3
+        end
+
+        
+        tex.print("\\begin{scope}[xshift="..hespacement..", yshift="..-vespacement.."-.2125cm]")
+        tex.print("\\draw[thick] (96.7pt,-39.9pt) rectangle (0, 0) node[anchor=north west]{\\textbf{".. case .."}};")
+            
+        item = {"A","B","C","D","E"}
+            
+        for colonne = 1,5 do
+            tex.print("\\node[xshift="..-16*(colonne-1).."] at (86.8pt,-20pt) {\\textbf{"..item[6-colonne].."}};")
+            for ligne = 0,1 do
+                % % Remplissage
+                % if (ligne == 0 and listeBilan[case] and listeBilan[case][colonne] and listeBilan[case][6-colonne] == "1") then
+                %     coloriage = ", fill=black"
+                % else
+                %     coloriage = ""
+                % end
+                % % fin de remplissage
+                tex.print("\\node at (90.3pt,-3.2pt)[draw, thick, rectangle, minimum width=7pt, minimum height=8.5pt, xshift="..-16*(colonne-1)..", yshift="..-24*ligne..", anchor=north east] {};")
+            end
+        end
+        tex.print("\\end{scope}")
+    end
+    }
+    \end{scope}
+\end{tikzpicture}
+} % fin de la resizebox 
+\normalsize
+\normalfont
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%% Ancienne commande pour la grille, nulle
+
+% % Générer la grille automatiquement 
+% %ngrille pour que je la retrouve plus vite avec ctrl f
+% \newcommand{\grillebeta}[0]{%
+% \newpage
+%     \sffamily
+%     \vspace*{-0.09\textheight}
+%     \resizebox{\linewidth}{!}{
+%     \begin{tikzpicture}
+%         %%%%%%% logo a2sup %%%%%%%%%%%%%%
+%         \node at (-6.8, 1.7) {
+%             \includegraphics[width=3.6cm]{logo.png}
+%         };
+%         %%%%%%% upc a2sup tuto %%%%%%%%%%%%%%
+%         \node at (-1.6, 2.6) {
+%             \begin{minipage}{6cm}
+%                 \vspace*{2.15cm}
+%                 \fontsize{20}{24}\selectfont{
+%                 Université Paris Cité \\ A2SUP - Tutorat
+%                 }
+%                 \hspace{-0.4cm}
+%             \end{minipage}
+%         };
+
+
+%         %%%%%%% nom prénom numéro a2sup %%%%%%%%%%%%%%
+%         \node at (3.75, 1.95) {
+%             \begin{minipage}{5cm}
+%                 \vspace*{2.18cm}
+%                 \fontsize{12}{13.5}\selectfont{
+%                 \noindent
+%                     Nom :\\
+%                     Prénom :\\
+%                     Numéro A2SUP :\\
+%                 }
+%                 \vspace*{0.8cm}
+%             \end{minipage}
+%         };
+
+%         %%%%%%%%% encadré rouge + son contenu + trait rouge du dessus avec tuto/ue(spé)  %%%%%%%%
+
+%         %%%%%%% trait du dessus + node %%%%%%%%%%%%%%
+%         \draw [color=red, line width=1pt] (1.23, 2.6) -- (8.5, 2.6); % trait du dessus
+        
+%         \fontsize{9}{9}\selectfont{
+%         \node[anchor=west] at (1.2, 2.9) {Tuto n° : \cmdcle@sujet@NumeroDuSupport };
+        
+%         % Indication de l'UE (spé)
+        
+%         \IfSubStr{\cmdcle@sujet@UE}{12}{
+%             \IfSubStr{\cmdcle@sujet@UE}{med}{
+%                 \node[anchor=west] at (4.6,2.9) {UE (spé) : SMR};
+%             }{
+%                 \IfSubStr{\cmdcle@sujet@UE}{odonto}{
+%                     \node[anchor=west] at (4.6,2.9) {UE (spé) : Odontologie};
+%                 }{
+%                     \IfSubStr{\cmdcle@sujet@UE}{maieu}{
+%                         \node[anchor=west] at (4.6,2.9) {UE (spé) : Maïeutique};
+%                     }{
+%                         \IfSubStr{\cmdcle@sujet@UE}{pharma}{
+%                             \node[anchor=west] at (4.6,2.9) {UE (spé) : Pharmacie};
+%                         }{
+%                         {\Huge \color{red} PROBLEME !! Vérifie bien l'UE que tu as indiquée !}
+%                         }
+%                     }
+%                 }
+%             }
+%         }{%
+%         \node[anchor=west] at (4.6,2.9) {UE (spé) : \cmdcle@sujet@UE};
+%         }
+%         }%fin de selectfontttt
+%         %%%%%%% "numéro a2sup" %%%%%%%%%%%%%%
+%         \node at (-7.75, -1.4){%
+%             \begin{minipage}{2cm}
+%             \centering
+%             \fontsize{8}{9}\selectfont{
+%             Numéro\\A2SUP}
+%             \end{minipage}};
+            
+%         %%%%%%% flèche sens de remplissage %%%%%%%%%%%%%%
+%         \draw[very thick, -{stealth}] (-7, -0.5) -- (-7, -2.25);
+
+
+%         %%%%%%% carrés n°a2sup + légendes + chiffres %%%%%%%%%%%%%%
+%         \node at (-6.75, -1.35){%
+%             \begin{minipage}{2cm}
+%                 \raggedleft
+%                 \setstretch{1.15}
+%                 \fontsize{8}{9}\selectfont{
+%                 Diz. Mil.\\ Mil. \\ Cent. \\ Diz. \\ Unit.}
+%             \end{minipage}
+%             };
+%         \foreach \n in {0,...,9}{
+%         % carrés numéro a2sup
+%         \draw [xshift=\n*13,
+%         thick] 
+%         (-5.3, -2.3) rectangle (-5.55, -2) 
+%         (-5.3, -1.9) rectangle (-5.55, -1.6)
+%         (-5.3, -1.5) rectangle (-5.55, -1.2) 
+%         (-5.3, -1.1) rectangle (-5.55, -0.8)
+%         (-5.3, -0.7) rectangle (-5.55, -0.4) node[above]{\hspace{-0.009\linewidth} \color{red}{%
+%         \fontsize{8}{9}\selectfont{%
+%         \n}}}; 
+%         };
+%         %%%%%%% carrés date de naissance + contrôle + légende + chiffres %%%%%%%%%%%%%%
+%         \node at (1, -1.1){%
+%             \begin{minipage}{2cm}
+%                 \raggedleft
+%                 \setstretch{1.15}
+%                 \fontsize{8}{9}\selectfont{Contrôle}
+%             \end{minipage}};
+
+%         \node at (2.25, -1.2){%
+%             \begin{minipage}{2cm}
+%                 \raggedleft
+%                 \setstretch{1.15}
+%                 \fontsize{8}{9}\selectfont{J diz. \\ J unit. \\ M diz. \\ M unit.}
+%             \end{minipage}};
+
+%         \foreach \e in {0,...,9}{% carrés date naissance
+%         \draw [xshift=\e*13,thick] 
+%         (3.4, -1.9) rectangle (3.65, -1.6)
+%         (3.4, -1.5) rectangle (3.65, -1.2) 
+%         (3.4, -1.1) rectangle (3.65, -0.8)
+%         (3.4, -0.7) rectangle (3.65, -0.4) node[above]{\hspace{-0.03\linewidth} \color{red}{\fontsize{8}{9}\selectfont{\e}}}; 
+%         };
+%         \node at (5.7, -2.17) {\fontsize{8}{9}\selectfont{Date de naissance (JJ/MM)}};
+
+%         %%%%%%% ligne id + encadré rouge %%%%%%%%%%%%%%
+%         \draw [line width=0.12cm, color=black!80] (-8.5, 0.2) -- (8.5, 0.2); %ligne "identification"
+%         \node at (0, 0.2) {\colorbox{white}{%
+%             \textbf{%
+%                 \fontsize{8}{9}\selectfont{%
+%                 \space IDENTIFICATION \space
+%             }}}
+%             }; %texte "IDENTIFICATION"
+%         \draw [color=red, line width=1pt] (-8.5, -2.45) rectangle (8.5, 0.4); %le fameux giga encadré rouge 
+
+        
+
+% \begin{scope}[xshift=-8.5cm, yshift=-2.7cm]
+
+% \def\interligne{46} % espaces verticaux entre les rectangles
+
+% %%%%%%%%%%% première colonne %%%%%%%%%%%
+% \foreach \i in {1,...,12} {% 1ere colonne
+% % rectangles bordures
+% \draw[yshift=-\i*\interligne, thick] (0,0) rectangle (3.4, 1.4);
+% % numéro de question
+% \draw[yshift=-\i*\interligne-.1cm, thick] (.25,1.22) node{%
+% \centering
+% \bf \textsf{
+% \fontsize{11}{10.5}\selectfont{\i}
+% }};
+% % carrés items
+% \foreach \j in {1,...,5} {%
+% % carrés supérieurs
+% \draw [xshift=\j*16+.1cm, yshift=-\i*\interligne+.97cm, thick] (0,0) rectangle (.25,.3);
+% % carrés inférieurs
+% \draw [xshift=\j*16+.1cm, yshift=-\i*\interligne+0.135cm, thick] (0,0) rectangle (.25,.3);
+%     }
+% % Lettres items
+% \foreach \x/\y in {1/A,2/B,3/C,4/D,5/E}
+% \draw [xshift=\x*16+0.22cm, yshift=-\i*\interligne+.7cm, thick] (0,0) node {%
+% \bf \textsf{%
+% \fontsize{8}{9}\selectfont{\y}
+% }};
+% }
+
+% \def\distance{4.55}
+% \def\shift{\distance*8.9/5}
+
+% %%%%%%%%%%% deuxième colonne %%%%%%%%%%%
+% \foreach \m in {13,...,24} {% 2eme colonne
+% % rectangles bordures
+% \draw[xshift=\distance cm,yshift=-(\m-12)*\interligne, thick] (0,0) rectangle (3.4,1.4);
+% % numéro de question
+% \draw[xshift=\distance cm,yshift=-(\m-12)*\interligne-.1cm, thick] (.25,1.22) node{%
+% \centering
+% \bf \textsf{
+% \fontsize{11}{10.5}\selectfont{\m}
+% }};
+% % carrés items
+% \foreach \j in {1,...,5} {%
+% % carrés supérieurs
+% \draw [xshift=(\j+\shift)*16+.1cm, yshift=-(\m-12)*\interligne+.97cm, thick] (0,0) rectangle (.25,.3);
+% % carrés inférieurs
+% \draw [xshift=(\j+\shift)*16+.1cm, yshift=-(\m-12)*\interligne+.135cm, thick] (0,0) rectangle (.25,.3);
+%     }
+% % Lettres items
+% \foreach \x/\y in {1/A,2/B,3/C,4/D,5/E}
+% \draw [xshift=(\x+\shift)*16+.22cm, yshift=-(\m-12)*\interligne+.7cm, thick] (0,0) node{\bf \textsf{
+% \fontsize{8}{9}\selectfont{\y}
+% }};
+% }
+% %%%%%%%%%%% troisème colonne %%%%%%%%%%%
+% \foreach \n in {25,...,36} { % 3eme colonne
+% % rectangles bordures
+% \draw[xshift=\distance*2cm,yshift=-(\n-24)*\interligne, thick] (0,0) rectangle (3.4,1.4);
+% % numéro de question
+% \draw[xshift=\distance*2cm,yshift=-(\n-24)*\interligne-.1cm, thick] (.25,1.22) node {%
+% \centering
+% \bf \textsf{%
+% \fontsize{11}{10.5}\selectfont{\n}
+% }};
+% % carrés items
+% \foreach \j in {1,...,5} {%
+% % carrés supérieurs
+% \draw [xshift=(\j+\shift*2)*16+.1cm, yshift=-(\n-24)*\interligne+.97cm, thick] (0,0) rectangle (.25,.3);
+% % carrés inférieurs
+% \draw [xshift=(\j+\shift*2)*16+.1cm, yshift=-(\n-24)*\interligne+.135cm, thick] (0,0) rectangle (.25,.3);
+%     }
+% % Lettres items
+% \foreach \x/\y in {1/A,2/B,3/C,4/D,5/E}
+% \draw [xshift=(\x+\shift*2)*16+.22cm, yshift=-(\n-24)*\interligne+.7cm, thick] (0,0) node{\bf \textsf{
+% \fontsize{8}{9}\selectfont{\y}
+% }};
+% }
+% %%%%%%%%%%% quatrième colonne %%%%%%%%%%%
+% \foreach \o in {37,...,45} {% 4eme colonne
+% % rectangles bordures
+% \draw[xshift=\distance*3cm,yshift=-(\o-36)*\interligne, thick] (0,0) rectangle (3.4,1.4);
+% % numéro de question
+% \draw[xshift=\distance*3cm,yshift=-(\o-36)*\interligne-.1cm, thick] (.25,1.22) node {%
+% \centering
+% \bf \textsf{%
+% \fontsize{11}{10.5}\selectfont{\o}
+% }};
+% % carrés items
+% \foreach \j in {1,...,5} {%
+% % carrés supérieurs
+% \draw [xshift=(\j+\shift*3)*16+.1cm, yshift=-(\o-36)*\interligne+.97cm, thick] (0,0) rectangle (.25,.3);
+% % carrés inférieurs
+% \draw [xshift=(\j+\shift*3)*16+.1cm, yshift=-(\o-36)*\interligne+.135cm, thick] (0,0) rectangle (.25,.3);
+%     }
+% % Lettres items
+% \foreach \x/\y in {1/A,2/B,3/C,4/D,5/E}
+% \draw [xshift=(\x+\shift*3)*16+.22cm, yshift=-(\o-36)*\interligne+.7cm, thick] (0,0) node{\bf \textsf{
+% \fontsize{8}{9}\selectfont{\y}
+% }};
+% }
+
+
+% %% Coloriage correction
+
+
+
+% % Parcourir les questions
+% \IfStrEq{\cmdcle@sujet@NombreDeQuestions}{}
+% {\draw (8.5,-6) node[rotate=45, draw, fill=red] {\color{white}\fontsize{30}{0}\selectfont{\bf Indique le nombre de questions !}};}
+% {%
+% \foreach \qst in {1,...,\cmdcle@sujet@NombreDeQuestions}
+% {\ifthenelse{\qst<13}
+%     {\case{1}}
+%         {\ifthenelse{\qst<25}
+%             {\case{2}}
+%                 {\ifthenelse{\qst<37}
+%                     {\case{3}}
+%                         {\case{4}}}}}
+% }
+% \end{scope}
+% \end{tikzpicture}
+% } % fin de la resizebox 
+% \normalsize
+% \normalfont
+% } % fin de \grillebeta
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\newcommand{\grille}{%
+\IfSubStr{\cmdcle@sujet@SujetOuCorrection}{orrec}{\grillealpha}{%
+% Le support n'est pas une correction, la grille n'apparaitra pas
+}%
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+%% ancienne commande pour la grille vierge, nulle
+
+% \newcommand{\grillevierge}{
+%     \newpage 
+%     \sffamily
+%     \vspace*{-0.09\textheight}
+%     \resizebox{\linewidth}{!}{
+%     \begin{tikzpicture}
+%         %%%%%%% logo a2sup %%%%%%%%%%%%%%
+%         \node at (-6.8, 1.7) {
+%             \includegraphics[width=3.6cm]{logo.png}
+%         };
+%         %%%%%%% upc a2sup tuto %%%%%%%%%%%%%%
+%         \node at (-1.6, 2.6) {
+%             \begin{minipage}{6cm}
+%                 \vspace*{2.15cm}
+%                 \fontsize{20}{24}\selectfont{
+%                 Université Paris Cité \\ A2SUP - Tutorat
+%                 }
+%                 \hspace{-0.4cm}
+%             \end{minipage}
+%         };
+
+
+%         %%%%%%% nom prénom numéro a2sup %%%%%%%%%%%%%%
+%         \node at (3.75, 1.95) {
+%             \begin{minipage}{5cm}
+%                 \vspace*{2.18cm}
+%                 \fontsize{12}{13.5}\selectfont{
+%                 \noindent
+%                     Nom :\\
+%                     Prénom :\\
+%                     Numéro A2SUP :\\
+%                 }
+%                 \vspace*{0.8cm}
+%             \end{minipage}
+%         };
+
+% \centering
+
+%         %%%%%%%%% encadré rouge + son contenu + trait rouge du dessus avec tuto/ue(spé)  %%%%%%%%
+
+%         %%%%%%% trait du dessus + node %%%%%%%%%%%%%%
+%         \draw [color=red, line width=1pt] (1.23, 2.6) -- (8.5, 2.6); % trait du dessus
+        
+%         \fontsize{9}{9}\selectfont{
+%         \node[anchor=west] at (1.2, 2.9) {Tuto n° : \cmdcle@sujet@NumeroDuSupport };
+        
+%         % Indication de l'UE (spé)
+        
+%         \IfSubStr{\cmdcle@sujet@UE}{12}{
+%             \IfSubStr{\cmdcle@sujet@UE}{med}{
+%                 \node[anchor=west] at (4.6,2.9) {UE (spé) : SMR};
+%             }{
+%                 \IfSubStr{\cmdcle@sujet@UE}{odonto}{
+%                     \node[anchor=west] at (4.6,2.9) {UE (spé) : Odontologie};
+%                 }{
+%                     \IfSubStr{\cmdcle@sujet@UE}{maieu}{
+%                         \node[anchor=west] at (4.6,2.9) {UE (spé) : Maïeutique};
+%                     }{
+%                         \IfSubStr{\cmdcle@sujet@UE}{pharma}{
+%                             \node[anchor=west] at (4.6,2.9) {UE (spé) : Pharmacie};
+%                         }{
+%                         {\Huge \color{red} OULA PROBLEME !! Vérifie bien l'UE que tu as indiquée !}
+%                         }
+%                     }
+%                 }
+%             }
+%         }{
+%         \node[anchor=west] at (4.6,2.9) {UE (spé) : \cmdcle@sujet@UE};
+%         }
+%         }%fin de selectfontttt
+%         %%%%%%% "numéro a2sup" %%%%%%%%%%%%%%
+%         \node at (-7.75, -1.4){
+%             \begin{minipage}{2cm}
+%             \centering
+%             \fontsize{8}{9}\selectfont{
+%             Numéro\\A2SUP}
+%             \end{minipage}};
+            
+%         %%%%%%% flèche sens de remplissage %%%%%%%%%%%%%%
+%         \draw[very thick, -{stealth}] (-7, -0.5) -- (-7, -2.25);
+
+
+%         %%%%%%% carrés n°a2sup + légendes + chiffres %%%%%%%%%%%%%%
+%         \node at (-6.75, -1.35){
+%             \begin{minipage}{2cm}
+%                 \raggedleft
+%                 \setstretch{1.15}
+%                 \fontsize{8}{9}\selectfont{
+%                 Diz. Mil.\\ Mil. \\ Cent. \\ Diz. \\ Unit.}
+%             \end{minipage}
+%             };
+%         \foreach \n in {0,...,9}{
+%         % carrés numéro a2sup
+%         \draw [xshift=\n*13,
+%         thick] 
+%         (-5.3, -2.3) rectangle (-5.55, -2) 
+%         (-5.3, -1.9) rectangle (-5.55, -1.6)
+%         (-5.3, -1.5) rectangle (-5.55, -1.2) 
+%         (-5.3, -1.1) rectangle (-5.55, -0.8)
+%         (-5.3, -0.7) rectangle (-5.55, -0.4) node[above]{\hspace{-0.009\linewidth} \color{red}{
+%         \fontsize{8}{9}\selectfont{
+%         \n}}}; 
+%         };
+%         %%%%%%% carrés date de naissance + contrôle + légende + chiffres %%%%%%%%%%%%%%
+%         \node at (1, -1.1){
+%             \begin{minipage}{2cm}
+%                 \raggedleft
+%                 \setstretch{1.15}
+%                 \fontsize{8}{9}\selectfont{
+%                 Contrôle}
+%             \end{minipage}};
+
+%         \node at (2.25, -1.2){
+%             \begin{minipage}{2cm}
+%                 \raggedleft
+%                 \setstretch{1.15}
+%                 \fontsize{8}{9}\selectfont{
+%                 J diz. \\ J unit. \\ M diz. \\ M unit.}
+%             \end{minipage}};
+
+%         \foreach \e in {0,...,9}{% carrés date naissance
+%         \draw [xshift=\e*13,thick] 
+%         (3.4, -1.9) rectangle (3.65, -1.6)
+%         (3.4, -1.5) rectangle (3.65, -1.2) 
+%         (3.4, -1.1) rectangle (3.65, -0.8)
+%         (3.4, -0.7) rectangle (3.65, -0.4) node[above]{\hspace{-0.03\linewidth} \color{red}{
+%         \fontsize{8}{9}\selectfont{\e}}}; 
+%         };
+%         \node at (5.7, -2.17) {\fontsize{8}{9}\selectfont{Date de naissance (JJ/MM)}};
+
+%         %%%%%%% ligne id + encadré rouge %%%%%%%%%%%%%%
+%         \draw [line width=0.12cm, color=black!80] (-8.5, 0.2) -- (8.5, 0.2); %ligne "identification"
+%         \node at (0, 0.2) {\colorbox{white}{
+%             \textbf{
+%                 \fontsize{8}{9}\selectfont{
+%                 \space IDENTIFICATION \space
+%             }}}
+%             }; %texte "IDENTIFICATION"
+%         \draw [color=red, line width=1pt] (-8.5, -2.45) rectangle (8.5, 0.4); %le fameux giga encadré rouge 
+
+%         %%%% partie de l'aigri %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        
+
+% \begin{scope}[xshift=-8.5cm, yshift=-2.7cm]
+
+% \def\interligne{46} % espaces verticaux entre les rectangles
+
+% %%%%%%%%%%% première colonne %%%%%%%%%%%
+% \foreach \i in {1,...,12} { % 1ere colonne
+% % rectangles bordures
+% \draw[yshift=-\i*\interligne, thick] (0,0) rectangle (3.4, 1.4);
+% % numéro de question
+% \draw[yshift=-\i*\interligne-.1cm, thick] (.25,1.22) node{
+% \centering
+% \bf \textsf{
+% \fontsize{11}{10.5}\selectfont{\i}
+% }};
+% % carrés items
+% \foreach \j in {1,...,5} {
+% % carrés supérieurs
+% \draw [xshift=\j*16+.1cm, yshift=-\i*\interligne+.97cm, thick] (0,0) rectangle (.25,.3);
+% % carrés inférieurs
+% \draw [xshift=\j*16+.1cm, yshift=-\i*\interligne+0.135cm, thick] (0,0) rectangle (.25,.3);
+%     }
+% % Lettres items
+% \foreach \x/\y in {1/A,2/B,3/C,4/D,5/E}
+% \draw [xshift=\x*16+0.22cm, yshift=-\i*\interligne+.7cm, thick] (0,0) node {
+% \bf \textsf{
+% \fontsize{8}{9}\selectfont{\y}
+% }};
+% }
+
+% \def\distance{4.55}
+% \def\shift{\distance*8.9/5}
+
+% %%%%%%%%%%% deuxième colonne %%%%%%%%%%%
+% \foreach \m in {13,...,24} { % 2eme colonne
+% % rectangles bordures
+% \draw[xshift=\distance cm,yshift=-(\m-12)*\interligne, thick] (0,0) rectangle (3.4,1.4);
+% % numéro de question
+% \draw[xshift=\distance cm,yshift=-(\m-12)*\interligne-.1cm, thick] (.25,1.22) node{
+% \centering
+% \bf \textsf{
+% \fontsize{11}{10.5}\selectfont{\m}
+% }};
+% % carrés items
+% \foreach \j in {1,...,5} {
+% % carrés supérieurs
+% \draw [xshift=(\j+\shift)*16+.1cm, yshift=-(\m-12)*\interligne+.97cm, thick] (0,0) rectangle (.25,.3);
+% % carrés inférieurs
+% \draw [xshift=(\j+\shift)*16+.1cm, yshift=-(\m-12)*\interligne+.135cm, thick] (0,0) rectangle (.25,.3);
+%     }
+% % Lettres items
+% \foreach \x/\y in {1/A,2/B,3/C,4/D,5/E}
+% \draw [xshift=(\x+\shift)*16+.22cm, yshift=-(\m-12)*\interligne+.7cm, thick] (0,0) node{\bf \textsf{
+% \fontsize{8}{9}\selectfont{\y}
+% }};
+% }
+% %%%%%%%%%%% troisème colonne %%%%%%%%%%%
+% \foreach \n in {25,...,36} { % 3eme colonne
+% % rectangles bordures
+% \draw[xshift=\distance*2cm,yshift=-(\n-24)*\interligne, thick] (0,0) rectangle (3.4,1.4);
+% % numéro de question
+% \draw[xshift=\distance*2cm,yshift=-(\n-24)*\interligne-.1cm, thick] (.25,1.22) node {
+% \centering
+% \bf \textsf{
+% \fontsize{11}{10.5}\selectfont{\n}
+% }};
+% % carrés items
+% \foreach \j in {1,...,5} {
+% % carrés supérieurs
+% \draw [xshift=(\j+\shift*2)*16+.1cm, yshift=-(\n-24)*\interligne+.97cm, thick] (0,0) rectangle (.25,.3);
+% % carrés inférieurs
+% \draw [xshift=(\j+\shift*2)*16+.1cm, yshift=-(\n-24)*\interligne+.135cm, thick] (0,0) rectangle (.25,.3);
+%     }
+% % Lettres items
+% \foreach \x/\y in {1/A,2/B,3/C,4/D,5/E}
+% \draw [xshift=(\x+\shift*2)*16+.22cm, yshift=-(\n-24)*\interligne+.7cm, thick] (0,0) node{\bf \textsf{
+% \fontsize{8}{9}\selectfont{\y}
+% }};
+% }
+% %%%%%%%%%%% quatrième colonne %%%%%%%%%%%
+% \foreach \o in {37,...,45} { % 4eme colonne
+% % rectangles bordures
+% \draw[xshift=\distance*3cm,yshift=-(\o-36)*\interligne, thick] (0,0) rectangle (3.4,1.4);
+% % numéro de question
+% \draw[xshift=\distance*3cm,yshift=-(\o-36)*\interligne-.1cm, thick] (.25,1.22) node {
+% \centering
+% \bf \textsf{
+% \fontsize{11}{10.5}\selectfont{\o}
+% }};
+% % carrés items
+% \foreach \j in {1,...,5} {
+% % carrés supérieurs
+% \draw [xshift=(\j+\shift*3)*16+.1cm, yshift=-(\o-36)*\interligne+.97cm, thick] (0,0) rectangle (.25,.3);
+% % carrés inférieurs
+% \draw [xshift=(\j+\shift*3)*16+.1cm, yshift=-(\o-36)*\interligne+.135cm, thick] (0,0) rectangle (.25,.3);
+%     }
+% % Lettres items
+% \foreach \x/\y in {1/A,2/B,3/C,4/D,5/E}
+% \draw [xshift=(\x+\shift*3)*16+.22cm, yshift=-(\o-36)*\interligne+.7cm, thick] (0,0) node{\bf \textsf{
+% \fontsize{8}{9}\selectfont{\y}
+% }};
+% }
+% \end{scope}
+% \end{tikzpicture}
+% } % fin de la resizebox 
+%     \normalsize
+%     \normalfont
+% } % fin de grillevierge
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\makeatother%
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                % Commandes inutiles %
+
+%% Inutile mais on sait jamais - permet d'encadrer du texte. mdframed a l'air de mieux gérer notre MEP...
+%\surroundwithmdframed[
+%  topline=false,
+%  rightline=false,
+%  bottomline=false,
+%  leftmargin=10pt,
+%  skipabove=10pt,
+%  skipbelow=\medskipamount
+%]{env}
+
+
+
+%% Fin du package
+\endinput
