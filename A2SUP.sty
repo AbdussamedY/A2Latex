@@ -1,0 +1,5187 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%    Version 2.0.3   20/08/2025 Modif des visu + logo discord
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%%%%%%%%%%%%%%%%% DEBUT DE TEMPLATE
+
+% \documentclass[12pt]{article}
+
+% \usepackage{A2SUP}
+
+% \begin{informations}
+%     UE = ,
+%     Support = ,
+%     NumeroDuSupport = ,
+%     SujetOuCorrection = ,
+%     Orientation = ,
+%     Pagination = ,
+%     TiersTemps = ,
+%     RecoSpecifiques = ,
+%     TitreExtra = ,
+%     SousTitre = ,
+%     Redacteurs = {
+%               Prénom NOM (filière),
+%               Prénom NOM (filière),
+%           },
+%     Relecteurs = {
+%               Prénom NOM (filière),
+%               Prénom NOM (filière),
+%           },
+%     ConvertisseursLatex = {
+%               Prénom NOM (filière),
+%               Prénom NOM (filière),
+%           },
+%     Testeurs = {
+%               Prénom NOM (filière),
+%               Prénom NOM (filière),
+%           },
+%     TuteursEnSeance = {
+%               Prénom NOM (filière),
+%               Prénom NOM (filière),
+%           },
+%     VP = {
+%            Prénom NOM (filière),
+%            Prénom NOM (filière),
+%           },
+%     Team = ,
+%     RM = {
+%            Prénom NOM (filière),
+%            Prénom NOM (filière),
+%           },
+%     FacRedactionOuCollab = ,
+%     RemerciementsBonus = ,
+%     Session = ,
+%     RelectureProfs = ,
+% \end{informations}
+
+
+% \begin{document}
+
+% \recto
+
+% \grille
+
+% \begin{inclure}[sujet]
+%     \pagevide
+% \end{inclure}
+
+% \input{motRM}
+
+% \section*{Exercice 1}
+
+% \begin{center}
+%     \includegraphics[width=0.5\linewidth]{img/Question01.png}
+% \end{center}
+
+% \question{1}
+% {Enoncé}
+% {Item A}
+% {Item B}
+% {Item C}
+% {Item D}
+% {Item E}
+% {AE}
+
+% \begin{correction}
+%     \correctionitem{Item A}
+%     Bla
+    
+%     \correctionitem{Item B}
+%     Bla
+    
+%     \correctionitem{Item C}
+%     Bla
+    
+%     \correctionitem{Item D}
+%     Bla
+    
+%     \correctionitem{Item E}
+%     Bla
+% \end{correction}
+
+% \verso
+
+% \end{document}
+
+%%%%%%%%%%%%%%%%% FIN DE TEMPLATE
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\RequirePackage{amssymb}
+\RequirePackage[french]{babel}
+\RequirePackage[tikz]{bclogo}
+\RequirePackage{chemfig}
+\RequirePackage{dashrule}
+\RequirePackage{emoji}
+\RequirePackage{enumitem}
+% \RequirePackage{etoolbox} % for hooks
+\RequirePackage{expl3}
+\RequirePackage{fancyhdr}
+% \RequirePackage[T1]{fontenc} % problem with ’ (ok with '...)
+\RequirePackage[]{geometry}
+\RequirePackage{graphicx}
+\RequirePackage{hyperref}
+\RequirePackage{icomma}
+\RequirePackage{l3draw}
+\RequirePackage{lipsum}
+\RequirePackage{lmodern}
+\RequirePackage{chemmacros} % after lmodern to avoid log message
+\RequirePackage[framemethod=tikz]{mdframed}
+\RequirePackage[version=4]{mhchem} % bcp trop lourd à loader
+\RequirePackage{moresize}
+\RequirePackage{pdfpages}
+\RequirePackage{pifont}
+\RequirePackage[export]{adjustbox} % Avant fillbetween (et donc préférablement pgfplots) : sinon erreur "LaTeX Error: Command \clipbox already defined."
+\RequirePackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepgfplotslibrary{fillbetween}
+\RequirePackage{pst-tree}
+\RequirePackage{setspace}
+\RequirePackage{tabularx}
+\RequirePackage{varwidth}
+\RequirePackage{tabularray}
+\UseTblrLibrary{varwidth}
+\RequirePackage[many]{tcolorbox}
+\RequirePackage{tikz}
+% \usetikzlibrary{external}
+% \tikzexternalize[prefix=]
+\usetikzlibrary{shadings,shadows,spy, shapes.misc, patterns}
+\RequirePackage{tkz-tab}
+\RequirePackage{truncate}
+\RequirePackage{realhats}
+\RequirePackage{ulem}
+\RequirePackage{wrapfig}
+\RequirePackage[table]{xcolor}
+% \RequirePackage{xparse}
+\RequirePackage{xstring} % for tests
+
+
+
+\ProvidesExplPackage
+  {A2SUP}
+  {2024-12-02}
+  {44.0}
+  {Package de l'A2SUP, codé en Expl3}
+
+
+\keys_define:nn { A2SUP }
+  {
+    année .tl_set:N = \annee,
+    année .initial:n = { 2025-2026 }, %%%%%%% INITIALISATION DE LA DATE PAR DEFAUT
+    correction .tl_set:N = \correction_color,
+    correction .initial:n = { red!1!white },
+    boite .tl_set:N = \boite_color,
+    boite .initial:n = { blue!3!white },
+    plan .tl_set:N = \plan_bool,
+    plan .initial:n = { non },
+    visu .tl_set:N = \visu_color,
+    visu .initial:n = { AASUP_color }
+  }
+
+\definecolor{AASUP_color}{RGB}{130, 24, 51}
+
+
+\ProcessKeysOptions { A2SUP }
+
+
+
+%%%%%%% LUALATEX TEST
+\RequirePackage{ifluatex}
+\ifluatex
+  \typeout{The compiler is LuaLaTeX.}
+\else
+  \PackageError{A2SUP}{Le~ module~ A2SUP~ nécessite~ LuaLaTeX}{Veilles~ à~ compiler~ ton~ fichier~ sous~ LuaLaTeX\MessageBreak%
+  Suis~ ce~ lien~ si~ tu~ ne~ sais~ pas~ comment~ faire~ :~ https://fr.overleaf.com/learn/how-to/Changing_compiler}
+\fi
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\str_if_eq:VnT \plan_bool { oui }
+    {
+        \RequirePackage{titlesec}
+        \titleformat{\section}
+          {\normalfont\Large\bfseries\color{red!80!black}}
+          {\thesection}{1em}{}
+        \titleformat{\subsection}
+          {\normalfont\large\bfseries\color{blue!80!black}}
+          {\thesubsection}{1em}{}
+        \titleformat{\subsubsection}
+          {\normalfont\normalsize\bfseries\color{green!60!black}}
+          {\thesubsubsection}{1em}{}
+        \titleformat{\paragraph}
+          {\normalfont\normalsize\bfseries\color{purple!70!black}}
+          {\theparagraph}{1em}{}
+        \setcounter{secnumdepth}{4}
+        \setcounter{tocdepth}{4}
+    }
+
+
+
+
+
+
+\tl_new:N \UEnumber
+\tl_new:N \SujetOuCorrection
+\tl_new:N \Orientation
+\tl_new:N \Pagination
+\tl_new:N \TiersTemps
+\tl_new:N \NumeroDuSupport
+\tl_new:N \RecoSpecifiques
+\tl_new:N \Support
+\tl_new:N \TitreExtra
+\tl_new:N \SousTitre
+\tl_new:N \Redacteurs
+\tl_new:N \Relecteurs
+\tl_new:N \ConvertisseursLatex
+\tl_new:N \TuteursEnSeance
+\tl_new:N \Testeurs
+\tl_new:N \RemerciementsBonus
+\tl_new:N \VP
+\tl_new:N \FacRedactionOuCollab
+\tl_new:N \Team
+\tl_new:N \RM
+\tl_new:N \Session
+\tl_new:N \RelectureProfs
+
+\tl_new:N \Module
+\tl_new:N \UEname
+\tl_new:N \UEnameShort
+\tl_new:N \UEtime
+\tl_new:N \UEtimeTT
+\tl_new:N \UEemojiname
+\tl_new:N \filiere
+
+
+\keys_define:nn { A2SUP/informations }
+  {
+    UE .tl_gset:N = \UEnumber,
+    UE .initial:n = { UE~ non~ indiqué },
+    SujetOuCorrection .tl_gset:N = \SujetOuCorrection,
+    SujetOuCorrection .initial:n = { sujet },
+    Orientation .tl_gset:N = \Orientation,
+    Orientation .initial:n = { },
+    Pagination .tl_gset:N = \Pagination,
+    Pagination .initial:n = { oui },
+    TiersTemps .tl_gset:N = \TiersTemps,
+    TiersTemps .initial:n = { non },
+    NumeroDuSupport .tl_gset:N = \NumeroDuSupport,
+    NumeroDuSupport .initial:n = { NumeroDuSupport~ non~ indiqué },
+    RecoSpecifiques .tl_gset:N = \RecoSpecifiques,
+    RecoSpecifiques .initial:n = {  },
+    Support .tl_gset:N = \Support,
+    Support .initial:n = { Support~ non~ indiqué },
+    TitreExtra .tl_gset:N = \TitreExtra,
+    TitreExtra .initial:n = { TitreExtra~ non~ indiqué },
+    SousTitre .tl_gset:N = \SousTitre,
+    SousTitre .initial:n = { SousTitre~ non~ indiqué },
+    Redacteurs .tl_gset:N = \Redacteurs,
+    Redacteurs .initial:n = { Redacteurs~ non~ indiqué },
+    Relecteurs .tl_gset:N = \Relecteurs,
+    Relecteurs .initial:n = {  },
+    ConvertisseursLatex .tl_gset:N = \ConvertisseursLatex,
+    ConvertisseursLatex .initial:n = {  },
+    TuteursEnSeance .tl_gset:N = \TuteursEnSeance,
+    TuteursEnSeance .initial:n = {  },
+    Testeurs .tl_gset:N = \Testeurs,
+    Testeurs .initial:n = {  },
+    RemerciementsBonus .tl_gset:N = \RemerciementsBonus,
+    RemerciementsBonus .initial:n = {  },
+    VP .tl_gset:N = \VP,
+    VP .initial:n = { VP non indiqué },
+    FacRedactionOuCollab .tl_gset:N = \FacRedactionOuCollab,
+    FacRedactionOuCollab .initial:n = { collab },
+    Team .tl_gset:N = \Team,
+    Team .initial:n = { Team~ non~ indiqué },
+    RM .tl_gset:N = \RM,
+    RM .initial:n = { RM~ non~ indiqué },
+    Session .tl_gset:N = \Session,
+    Session .initial:n = { Session~ non~ indiquée },
+    RelectureProfs .tl_gset:N = \RelectureProfs,
+    RelectureProfs .initial:n = { non },
+  }
+
+\NewDocumentEnvironment{informations}{+b}
+    {
+        \keys_set:nn { A2SUP/informations } { #1 }
+    }
+    {}
+    
+\AfterEndEnvironment{informations}
+    {
+        \dim_set:Nn \parindent { 0pt } % retrait indentation
+
+        %%%%%%%% Définition des booléens
+        \bool_new:N \g_correction_bool
+        \bool_new:N \g_tierstemps_bool
+        \bool_new:N \g_relectureprofs_bool
+        
+        \str_if_in:NnTF \SujetOuCorrection { orrect }
+            { \bool_gset_true:N \g_correction_bool }
+            { \bool_gset_false:N \g_correction_bool }
+            
+        \str_if_in:NnTF \TiersTemps { oui }
+            { \bool_gset_true:N \g_tierstemps_bool }
+            { \bool_gset_false:N \g_tierstemps_bool }
+
+        \str_if_in:NnTF \RelectureProfs { oui }
+            { \bool_gset_true:N \g_relectureprofs_bool }
+            { \bool_gset_false:N \g_relectureprofs_bool }
+        
+
+
+        %%%%%%%% Orientation de la page
+        \bool_if:NTF \g_correction_bool
+            {
+                \str_if_in:NnTF \Orientation { ortrait }
+                    { \geometry{a4paper, margin=2cm} }
+                    { \geometry{a3paper, landscape, twocolumn, margin=2cm, columnsep=2cm, twoside} }
+            }
+            {
+                \str_if_in:NnTF \Orientation { aysage }
+                    { \geometry{a3paper, landscape, twocolumn, margin=2cm, columnsep=2cm, twoside} }
+                    { \geometry{a4paper, margin=2cm} }
+            }
+
+
+        %%%%%%% Pagination des pages
+        \pagestyle{fancy}
+        \renewcommand{\headrulewidth}{0pt}
+        \fancyhead{}
+        \renewcommand{\footrulewidth}{0pt}
+        \fancyfoot[L]{}
+        \str_if_in:NnTF \Pagination { non }
+            {
+                \cfoot{}
+                \rfoot{}    
+            }
+            {
+                \ifdim\paperwidth<\paperheight
+                    \cfoot{}
+                    \rfoot{\large\thepage}
+                \else
+                    \cfoot{\large\thepage}
+                    \rfoot{}
+                \fi
+            }
+        
+        
+        %%%%%%% Pour Tiers-Temps
+        \bool_if:NTF \g_tierstemps_bool
+            {
+                \RequirePackage[fontsize=14pt]{scrextend}
+                \setstretch{1.5}
+            }
+            {}
+
+        %%%%%%% Définition des paramètres spécifiques aux UEs
+        \cs_new:Npn \UEdefine:nnnnnnn #1#2#3#4#5#6#7
+            {
+                \str_gset:Nn \Module {#1}
+                \str_gset:Nn \UEname {#2}
+                \str_gset:Nn \UEnameShort {#3}
+                \str_gset:Nn \UEtime {#4}
+                \str_gset:Nn \UEtimeTT {#5}
+                \str_gset:Nn \UEemojiname {#6}
+                \str_gset:Nn \filiere {#7}
+            }
+        \str_case:VnTF \UEnumber
+            {
+                {1} {
+                        \UEdefine:nnnnnnn {UE}{Chimie}{1}{1h30}{2h}{test-tube}{PASS}
+
+                        \NewDocumentCommand{\MEPquestion}{ m +m }
+                            {{\mathversion{bold}\bfseries Question~{#1}\par{#2}\mathversion{normal}\par}}
+                        \dim_new:N \g_indentation_item_dim
+                        \dim_set:Nn \g_indentation_item_dim { \dimexpr -6pt \relax }
+                    }
+                {2} {
+                        \UEdefine:nnnnnnn {UE}{Biochimie}{2}{1h30}{2h}{dna}{PASS}
+
+                        \NewDocumentCommand{\MEPquestion}{ m +m }
+                            {{\mathversion{bold}\bfseries Question~{#1}\par{#2}\mathversion{normal}\par}}
+                        \dim_new:N \g_indentation_item_dim
+                        \dim_set:Nn \g_indentation_item_dim { \dimexpr -6pt \relax }
+                    }
+                {3} { 
+                        \UEdefine:nnnnnnn {UE}{Biologie~Cellulaire}{3}{1h30}{2h}{microbe}{PASS}
+
+                        \NewDocumentCommand{\MEPquestion}{ m +m }
+                            {{\mathversion{bold}\bfseries Question~{#1}\par{#2}\mathversion{normal}\par}}
+                        \dim_new:N \g_indentation_item_dim
+                        \dim_set:Nn \g_indentation_item_dim { \dimexpr -6pt \relax }
+                    }
+                {4} { 
+                        \UEdefine:nnnnnnn {UE}{Physique}{4}{1h30}{2h}{star2}{PASS}
+
+                        \NewDocumentCommand{\MEPquestion}{ m +m }
+                            {{\mathversion{bold}\bfseries Question~{#1}\par{#2}\mathversion{normal}\par}}
+                        \dim_new:N \g_indentation_item_dim
+                        \dim_set:Nn \g_indentation_item_dim { \dimexpr -6pt \relax }
+                    }
+                {5} { 
+                        \UEdefine:nnnnnnn {UE}{Histologie~-~Embryologie}{5}{1h}{1h20}{lungs}{PASS}
+                        
+                        \NewDocumentCommand{\MEPquestion}{ m +m }
+                            {{\mathversion{bold}\bfseries Question~{#1}\par{#2}\mathversion{normal}\par}}
+                        \dim_new:N \g_indentation_item_dim
+                        \dim_set:Nn \g_indentation_item_dim { \dimexpr -6pt \relax }
+                    }
+                {6} { 
+                        \UEdefine:nnnnnnn {UE}{Santé~Publique}{6}{45~minutes}{1h}{hospital}{PASS}
+
+                        \NewDocumentCommand{\MEPquestion}{ m +m }
+                            {{\mathversion{bold}\bfseries Question~{#1}\par{#2}\mathversion{normal}\par}}
+                        \dim_new:N \g_indentation_item_dim
+                        \dim_set:Nn \g_indentation_item_dim { \dimexpr -6pt \relax }
+                    }
+                {7} { 
+                        \UEdefine:nnnnnnn {UE}{SHS}{7}{1h30}{2h}{classical-building}{PASS}
+
+                        \NewDocumentCommand{\MEPquestion}{ m +m }
+                            {{\mathversion{bold}\bfseries Question~{#1}\par{#2}\mathversion{normal}\par}}
+                        \dim_new:N \g_indentation_item_dim
+                        \dim_set:Nn \g_indentation_item_dim { \dimexpr -6pt \relax }
+                    }
+                {8} { 
+                        \UEdefine:nnnnnnn {UE}{ICM}{8}{45~minutes}{1h}{pill}{PASS}
+
+                        \NewDocumentCommand{\MEPquestion}{ m +m }
+                            {{\mathversion{bold}\bfseries Question~{#1}\par{#2}\mathversion{normal}\par}}
+                        \dim_new:N \g_indentation_item_dim
+                        \dim_set:Nn \g_indentation_item_dim { \dimexpr -6pt \relax }
+                    }
+                {9} { 
+                        \UEdefine:nnnnnnn {UE}{Mathématiques~-~Biostatistiques}{9}{1h}{1h20}{triangular-ruler}{PASS}
+                        
+                        \NewDocumentCommand{\MEPquestion}{ m +m }
+                            % {\hangindent=3.25em\hangafter=1{\bfseries Question~{#1}}\quad{#2}\par}
+                            {\leftskip=3.25em\begingroup\hspace{-3.25em}{\mathversion{bold}\bfseries Question~{#1}}\quad{#2}\mathversion{normal}\endgroup\par}
+                        \dim_new:N \g_indentation_item_dim
+                        \dim_set:Nn \g_indentation_item_dim { 2.7em }
+                    }
+                {10} { 
+                        \UEdefine:nnnnnnn {UE}{Anatomie}{10}{45~minutes}{1h}{anatomical-heart}{PASS}
+
+                        \NewDocumentCommand{\MEPquestion}{ m +m }
+                            {{\mathversion{bold}\bfseries Question~{#1}\par{#2}\mathversion{normal}\par}}
+                        \dim_new:N \g_indentation_item_dim
+                        \dim_set:Nn \g_indentation_item_dim { \dimexpr -6pt \relax }
+                    }
+                {11} { 
+                        \UEdefine:nnnnnnn {UE}{Biophysique}{11}{1h30}{2h}{radioactive}{PASS}
+
+                        \NewDocumentCommand{\MEPquestion}{ m +m }
+                            {{\mathversion{bold}\bfseries Question~{#1}\par{#2}\mathversion{normal}\par}}
+                        \dim_new:N \g_indentation_item_dim
+                        \dim_set:Nn \g_indentation_item_dim { \dimexpr -6pt \relax }
+                    }
+                {12med} { 
+                        \UEdefine:nnnnnnn {UE}{SMR}{12}{1h}{1h20}{stethoscope}{PASS}
+
+                        \NewDocumentCommand{\MEPquestion}{ m +m }
+                            {{\mathversion{bold}\bfseries Question~{#1}\par{#2}\mathversion{normal}\par}}
+                        \dim_new:N \g_indentation_item_dim
+                        \dim_set:Nn \g_indentation_item_dim { \dimexpr -6pt \relax }
+                    }
+                {12odonto} { 
+                        \UEdefine:nnnnnnn {UE}{Odontologie}{12}{45~minutes}{1h}{tooth}{PASS}
+
+                        \NewDocumentCommand{\MEPquestion}{ m +m }
+                            {{\mathversion{bold}\bfseries Question~{#1}\par{#2}\mathversion{normal}\par}}
+                        \dim_new:N \g_indentation_item_dim
+                        \dim_set:Nn \g_indentation_item_dim { \dimexpr -6pt \relax }
+                    }
+                {12pharma} { 
+                        \UEdefine:nnnnnnn {UE}{Pharmacie}{12}{1h}{1h20}{alembic}{PASS}
+
+                        \NewDocumentCommand{\MEPquestion}{ m +m }
+                            {{\mathversion{bold}\bfseries Question~{#1}\par{#2}\mathversion{normal}\par}}
+                        \dim_new:N \g_indentation_item_dim
+                        \dim_set:Nn \g_indentation_item_dim { \dimexpr -6pt \relax }
+                    }
+                {12maieu} { 
+                        \UEdefine:nnnnnnn {UE}{Maïeutique}{12}{45~minutes}{1h}{teddy-bear}{PASS}
+
+                        \NewDocumentCommand{\MEPquestion}{ m +m }
+                            {{\mathversion{bold}\bfseries Question~{#1}\par{#2}\mathversion{normal}\par}}
+                        \dim_new:N \g_indentation_item_dim
+                        \dim_set:Nn \g_indentation_item_dim { \dimexpr -6pt \relax }
+                    }
+                {1.1} { 
+                        \UEdefine:nnnnnnn {ECUE}{Chimie}{1.1}{1h}{1h20}{test-tube}{L.AS}
+
+                        \NewDocumentCommand{\MEPquestion}{ m +m }
+                            {{\mathversion{bold}\bfseries Question~{#1}\par{#2}\mathversion{normal}\par}}
+                        \dim_new:N \g_indentation_item_dim
+                        \dim_set:Nn \g_indentation_item_dim { \dimexpr -6pt \relax }
+                    }
+                {1.2} { 
+                        \UEdefine:nnnnnnn {ECUE}{Biophysique}{1.2}{30~ minutes}{40~ minutes}{radioactive}{L.AS}
+
+                        \NewDocumentCommand{\MEPquestion}{ m +m }
+                            {{\mathversion{bold}\bfseries Question~{#1}\par{#2}\mathversion{normal}\par}}
+                        \dim_new:N \g_indentation_item_dim
+                        \dim_set:Nn \g_indentation_item_dim { \dimexpr -6pt \relax }
+                    }
+                {2.1} { 
+                        \UEdefine:nnnnnnn {ECUE}{Biochimie}{2.1}{45~ minutes}{1h}{dna}{L.AS}
+
+                        \NewDocumentCommand{\MEPquestion}{ m +m }
+                            {{\mathversion{bold}\bfseries Question~{#1}\par{#2}\mathversion{normal}\par}}
+                        \dim_new:N \g_indentation_item_dim
+                        \dim_set:Nn \g_indentation_item_dim { \dimexpr -6pt \relax }
+                    }
+                {2.2} { 
+                        \UEdefine:nnnnnnn {ECUE}{Biologie~Cellulaire}{2.2}{45~ minutes}{1h}{microbe}{L.AS}
+
+                        \NewDocumentCommand{\MEPquestion}{ m +m }
+                            {{\mathversion{bold}\bfseries Question~{#1}\par{#2}\mathversion{normal}\par}}
+                        \dim_new:N \g_indentation_item_dim
+                        \dim_set:Nn \g_indentation_item_dim { \dimexpr -6pt \relax }
+                    }
+                {3.1} { 
+                        \UEdefine:nnnnnnn {ECUE}{Histologie~Embryologie~Anatomie}{3.1}{1h}{1h20}{anatomical-heart}{L.AS}
+
+                        \NewDocumentCommand{\MEPquestion}{ m +m }
+                            {{\mathversion{bold}\bfseries Question~{#1}\par{#2}\mathversion{normal}\par}}
+                        \dim_new:N \g_indentation_item_dim
+                        \dim_set:Nn \g_indentation_item_dim { \dimexpr -6pt \relax }
+                    }
+                {3.2} { 
+                        \UEdefine:nnnnnnn {ECUE}{ICM}{3.2}{30~ minutes}{40~ minutes}{pill}{L.AS}
+
+                        \NewDocumentCommand{\MEPquestion}{ m +m }
+                            {{\mathversion{bold}\bfseries Question~{#1}\par{#2}\mathversion{normal}\par}}
+                        \dim_new:N \g_indentation_item_dim
+                        \dim_set:Nn \g_indentation_item_dim { \dimexpr -6pt \relax }
+                    }
+                {4.1} { 
+                        \UEdefine:nnnnnnn {ECUE}{SHS}{4.1}{45~ minutes}{1h}{cherry-blossom}{L.AS}
+
+                        \NewDocumentCommand{\MEPquestion}{ m +m }
+                            {{\mathversion{bold}\bfseries Question~{#1}\par{#2}\mathversion{normal}\par}}
+                        \dim_new:N \g_indentation_item_dim
+                        \dim_set:Nn \g_indentation_item_dim { \dimexpr -6pt \relax }
+                    }
+                {4.2} { 
+                        \UEdefine:nnnnnnn {ECUE}{Santé~Publique}{4.2}{30~ minutes}{45~ minutes}{hospital}{L.AS}
+
+                        \NewDocumentCommand{\MEPquestion}{ m +m }
+                            {{\mathversion{bold}\bfseries Question~{#1}\par{#2}\mathversion{normal}\par}}
+                        \dim_new:N \g_indentation_item_dim
+                        \dim_set:Nn \g_indentation_item_dim { \dimexpr -6pt \relax }
+                    }
+            } 
+            {
+                \typeout{UE Variable~matches~one~of~the~strings}
+            }
+            {
+                \PackageError
+                    {A2SUP}
+                    {ERREUR~SUR~L'INDICATION~DE~L'UE}
+                    {
+                        Revois~l'UE~que~tu~as~indiquée. 
+                        \MessageBreak
+                        En~PASS:
+                        \MessageBreak
+                        1~Chimie \MessageBreak
+                        2~Biochimie \MessageBreak
+                        3~Biologie~ Cellulaire \MessageBreak
+                        4~Physique \MessageBreak
+                        5~Histologie-Embryologie \MessageBreak
+                        6~Santé~ Publique \MessageBreak
+                        7~SHS \MessageBreak
+                        8~ICM \MessageBreak
+                        9~Maths-Biostats \MessageBreak
+                        10~Anatomie \MessageBreak
+                        11~Biophysique \MessageBreak
+                        12med~SMR \MessageBreak
+                        12odonto~Dentaire \MessageBreak
+                        12pharma~Pharmacie \MessageBreak
+                        12maieu~Maïeutique
+                        \MessageBreak
+                        En~L.AS:
+                        \MessageBreak
+                        1.1~Chimie \MessageBreak
+                        1.2~Biophysique \MessageBreak
+                        2.1~Biochimie \MessageBreak
+                        2.2~Biocell \MessageBreak
+                        3.1~HEA \MessageBreak
+                        3.2~ICM \MessageBreak
+                        4.1~SHS \MessageBreak
+                        4.2~SP \MessageBreak
+                    }
+            }
+        
+        \tl_set:Nn \l_tmpa_tl { \tl_head:N \filiere }
+        \cs_set_eq:cc { rectoannale } { rectoannale \l_tmpa_tl }
+        \cs_set_eq:cc { rectopolyQCM } { rectopolyQCM \l_tmpa_tl }
+        \cs_set_eq:cc { rectopolyExos } { rectopolyExos \l_tmpa_tl }
+        \cs_set_eq:cc { rectoextra } { rectoextra \l_tmpa_tl }
+        \cs_set_eq:cc { rectofiche } { rectofiche \l_tmpa_tl }
+        \cs_set_eq:cc { rectoGT } { rectoGT \l_tmpa_tl }
+        \cs_set_eq:cc { rectotuto } { rectotuto \l_tmpa_tl }
+        \cs_set_eq:cc { encadreAsso } { encadreAsso \l_tmpa_tl }
+        \cs_set_eq:cc { verso } { verso \l_tmpa_tl }
+        
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\cs_new:Npn \__motRM_tcolorbox:n #1
+{
+    \begin{tcolorbox}[enhanced, breakable, boxrule = .5pt, colback = \l_motRM_couleur_tl]
+        \tl_if_empty:NF \l_motRM_title_tl
+            {
+                {
+                    \Large \uline{\sc \l_motRM_title_tl}
+                }\par \bigskip
+            }
+        #1
+    \end{tcolorbox}
+}
+
+
+\keys_define:nn { A2SUP/motRM }
+    {
+        titre .tl_set:N = \l_motRM_title_tl,
+        afficher .tl_set:N = \l_motRM_show_tl,
+        afficher .initial:n = { correction },
+        couleur .tl_set:N = \l_motRM_couleur_tl,
+        couleur .initial:n = { blue!1!white }
+    }
+
+\NewDocumentEnvironment{motRM}{ o +b }
+    {
+        \IfNoValueTF{#1}
+            {}{ \keys_set:nn { A2SUP/motRM } {#1} }
+
+
+        \str_case:VnF \l_motRM_show_tl
+            {
+                {sujet}
+                    {
+                        \bool_if:NF \g_correction_bool
+                            { \__motRM_tcolorbox:n {#2} }
+                    }
+                {correction}
+                    {
+                        \bool_if:NT \g_correction_bool
+                            { \__motRM_tcolorbox:n {#2} }
+                    }
+                {toujours}
+                    { \__motRM_tcolorbox:n {#2} }
+            }
+            {
+                \PackageError
+                    {A2SUP}
+                    {ERREUR~D'OPTION~ENVIRONNEMENT~motRM}
+                    {
+                        Cet~ environnement~ accepte~ les~ options~ :\MessageBreak\MessageBreak
+                        1.~titre=...~(ou~titre={...}~si~...~contient~des~virgules~(,))\MessageBreak
+                        2.~afficher=correction/sujet/toujours\MessageBreak
+                        3.~couleur=...
+                    }
+            }        
+    }
+    {
+        \par
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\keys_define:nn { A2SUP/boite }
+    {
+        titre .tl_set:N = \l_boite_title_tl,
+        titre .initial:n = { Titre~ par~ défaut },
+        emoji .tl_set:N = \l_boite_emoji_tl,
+        emoji .initial:n = { \emoji{wink} },
+        couleur .tl_set:N = \l_boite_couleur_tl,
+        couleur .initial:n = { \boite_color },
+        largeur .dim_set:N = \l_boite_width_dim,
+        largeur .initial:n = { 0.85\linewidth }
+    }
+
+\NewDocumentEnvironment{boite}{ o +b }
+    {
+        \IfNoValueTF{#1}
+            {}{ \keys_set:nn { A2SUP/boite } {#1} }
+
+        \begin{center}
+            \begin{tcolorbox}[enhanced, boxrule = 0.5pt, colback = \l_boite_couleur_tl, width = \l_boite_width_dim, drop~ fuzzy~ shadow=black]
+                \begin{tabularx}{\linewidth}{@{}c@{\hskip 5pt}X@{}}
+                    \large \l_boite_emoji_tl
+                        &
+                    \bfseries \l_boite_title_tl
+                \end{tabularx}\par \medskip
+    
+                #2
+            \end{tcolorbox}
+        \end{center}
+    }
+    {
+        \par
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\NewDocumentEnvironment{inclure}{ o +b }
+    {
+        
+        \str_case:nnF { #1 }
+            {
+                {sujet}
+                    {
+                        \bool_if:NF \g_correction_bool
+                            { #2 }
+                    }
+                {correction}
+                    {
+                        \bool_if:NT \g_correction_bool
+                            { #2 }
+                    }
+            }
+            {
+                #2
+            }
+        
+    }
+    {
+        \par
+    }
+
+
+
+\NewDocumentCommand{\pagevide}{ }
+    {
+        \newpage\mbox{}\newpage
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+\NewDocumentCommand{\brouillon}{}
+    {
+        \bigskip
+        
+        \tcblower
+    
+        \begin{large}
+            \bfseries
+            \emoji{memo}\, Brouillon
+        \end{large}
+    
+        \par\medskip
+    }
+
+
+\NewDocumentCommand{\figanalyse}{ +m }
+    {
+        \par\bigskip
+        
+        \begin{bfseries}
+            \uline{#1} :
+        \end{bfseries}
+    
+        \par\medskip
+    }
+
+
+
+\NewDocumentEnvironment{analyse}{ +b }
+    {
+        \bool_if:NTF \g_correction_bool
+            {
+                \begin{tcolorbox}[enhanced, breakable, boxrule=0.5pt, colback=green!2]
+                    \begin{Large}
+                        \bfseries
+                        \emoji{microscope}\, \uline{Analyse}
+                    \end{Large}
+                    
+                    \par\medskip
+                
+                    #1
+                \end{tcolorbox}
+            }{}
+    }{}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\NewDocumentCommand{\recto}{o}
+    {
+        \bool_if:NTF \g_tierstemps_bool
+            { \setstretch{1} }{}
+
+        \str_case:VnTF \Support
+            {
+                {tuto} {\rectotuto}
+                {GT} {\rectoGT}
+                {fiche} {\rectofiche}
+                {extra} {\rectoextra}
+                {poly~de~QCM} {\rectopolyQCM}
+                {poly~d'exos} {\rectopolyExos}
+                {annale} {\rectoannale}
+                {pack}{\rectoPack[#1]}
+            }
+            {
+                \typeout{Indicated support matches with one of existing support}
+            }
+            {
+                \PackageError
+                    {A2SUP}
+                    {ERREUR~SUR~L'INDICATION~DU~SUPPORT}
+                    {
+                    Revois~le~support~que~tu~as~indiqué.
+                    \MessageBreak
+                    "tuto"~->~Examen~ Blanc \MessageBreak
+                    "GT"~->~Groupe~ de~ Travail \MessageBreak
+                    "poly~ d'exos"~->~Polycopié~ d'Exercices \MessageBreak
+                    "poly~ de~ QCM"~->~Polycopié~ de~ QCMs \MessageBreak
+                    "fiche"~->~Fiche \MessageBreak
+                    "extra"~->~Extra \MessageBreak
+                    "annale"~->~Annale \MessageBreak
+                    "pack"~->~Pack~de~fiches \MessageBreak
+                    }
+            }
+
+        \bool_if:NTF \g_tierstemps_bool
+            { \normalfont \setstretch{1.5} }{}
+        \newpage
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\NewDocumentCommand{\rectoPack}{o}
+    {
+        \thispagestyle{empty}
+        \begin{center}
+            %%%%% LOGO ET UNIVERSITE
+            \includegraphics[width=3cm]{logo.png}\par
+            \fontsize{12pt}{14pt}\selectfont
+            \textsc{Tutorat~ \filiere}~ \annee\par 
+            \textsc{Université~ Paris~ Cité}\par
+           
+
+            \vfill
+
+            \fontsize{30pt}{35pt}\selectfont
+            \Module\ {\UEnumber}
+            \bigskip
+            \hbox_set:Nn \l_tmpa_box { \textsc{\UEname} }
+            \dim_compare:nNnTF { \box_wd:N \l_tmpa_box } > { \linewidth }
+                {
+                    \par \resizebox{\linewidth}{!}{\textsc{\UEname}}
+                }
+                {
+                    \par {\textsc{\UEname}}
+                }
+
+            \bigskip
+
+            \par {\fontsize{35pt}{35pt}\selectfont \normalfont \emoji{\UEemojiname}}
+
+
+            \IfNoValueTF{#1}
+                {}
+                {
+                    \vfill
+
+                    #1
+                }
+
+            \vfill
+
+            {\fontsize{30pt}{30pt}\selectfont \bfseries PACK~ FICHES~ N$^\circ$\NumeroDuSupport}
+
+            \vfill
+
+
+
+
+            \begin{minipage}{\linewidth}
+            \fontsize{10pt}{12pt}\selectfont
+            \par Il~ s'agit~ de~ fiches~ \textbf{non~ exhaustives}~ des~ notions~ essentielles~ concernant~ vos~ cours.~ Cela~ ne~ remplace~ pas~ les~ capsules~ et~ vos~ notes~ se~ rapportant~ aux~ explications~ des~ professeurs.~ Nous~ vous~ invitons~ à~ assister~ aux~ créneaux~ hebdomadaires,~ parfois~ organisés~ par~ l'équipe~ de~ professeurs~ ou~ par~ l'A2SUP.~ N'hésitez~ pas~ à~ consulter~ régulièrement~ la~ catégorie~ L.AS~ des~ Outils~ Pédagogiques~ du~ site~ internet~ A2SUP~ pour~ avoir~ accès~ aux~ dernières~ fiches~ pour~ les~ L.AS~ !
+            \end{minipage}
+            
+            \medskip
+
+            \par \encadreAsso
+        \end{center}
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\NewDocumentCommand{\rectoannaleP}{}
+    {
+        \thispagestyle{empty}
+        \includegraphics[width=5cm]{upc_logo.png}
+
+        \begin{center}
+            \fontsize{22pt}{27pt}\selectfont
+            \vfill
+            Université~Paris~Cité\par
+            Faculté~de~Santé\par
+            Année~Universitaire~\annee\par
+
+            \vfill
+
+            \begin{bfseries}
+                Examen~ \filiere\par
+                \Module\ \UEnameShort\par
+                \UEname\par
+                \Session\par
+                {\normalfont Durée~ de~ l'épreuve~ :}~ \UEtime\par
+                (Temps~ majoré~ \UEtimeTT)
+            \end{bfseries}
+            \vfill
+        \end{center}
+
+        \fontsize{12pt}{14pt}\selectfont
+
+        \vfill
+
+        \par \textsc{À~lire~avant~de~commencer~l'épreuve}
+        \smallskip
+        \par \fbox
+                {
+                    \parbox{\dimexpr\linewidth - 2\fboxrule - 2\fboxsep\relax}
+                        {
+                            \strut
+                            \bfseries
+                            Vérifiez~ que~ les~ informations~ saisies~ sur~ votre~ grille~ QCM~ sont~ correctes~ :~ nom,~ prénom~ et~ numéro~ étudiant.
+    
+                            \par Les~ correcteurs~ liquides~ ou~ en~ ruban~ de~ type~ Blanco,~ Tipp-Ex,~ et~ autres~ sont~ interdits~ car~ chaque ~ question~ comporte~ une~ ligne~ de~ droit~ au~ remords.
+                            
+                            \par Seule~ l'utilisation~ du~ stylo~ à~ bille~ noir~ est~ autorisée~ pour~ cocher~ les~ grilles.
+                            \strut
+                        }
+                }
+
+        \bigskip
+
+        \par \textsc{Informations~ réglementaires}
+        \smallskip
+        \par \fbox
+                {
+                    \parbox{\dimexpr\linewidth - 2\fboxrule - 2\fboxsep\relax}
+                        {
+                            \group_begin:
+                            \begin{list}{\textbullet}
+                                {
+                                    \setlength{\leftmargin}{1em}
+                                    \setlength{\labelsep}{0.25em}
+                                    \setlength{\itemsep}{0em}
+                                    \setlength{\parsep}{0em}
+                                    \setlength{\topsep}{0em}
+                                }
+                                \item Les~ questions~ sans~ réponse~ seront~ considérées~ comme~ nulles.
+                                \item Une~ grille~ QCM~ est~ à~ remplir~ pour~ l’ensemble~ de~ l’épreuve.
+                                \item Veiller~ à~ remplir~ complètement~ toute~ la~ surface~ des~ cases~ choisies.
+                                \item Ne~ pas~ gratter,~ ne~ pas~ raturer,~ ne~ pas~ mettre~ de~ croix~ ni~ aucun~ autre~ signe.
+                                \item Toute~ fraude~ ou~ tentative~ de~ fraude~ fera~ l'objet~ de~ poursuites~ disciplinaires~ (Décret~ n$^\circ$92-657~ du~ 13~ juillet~ 1992).~ Tout~ signe~ distinctif~ porté~ sur~ la~ grille~ QCM~ pouvant~ indiquer~ sa~ provenance~ constitue~ une~ fraude.
+    
+                                \bool_if:nTF 
+                                    {
+                                        \str_if_eq_p:no { 4 } { \UEnumber } ||
+                                        \str_if_eq_p:no { 9 } { \UEnumber } ||
+                                        \str_if_eq_p:no { 11 } { \UEnumber } ||
+                                        \str_if_eq_p:no { 1.2 } { \UEnumber } ||
+                                        \str_if_eq_p:no { 4.2 } { \UEnumber }
+                                    }
+                                    {
+                                        \item Les~ calculatrices~ \textbf{sont~ autorisées}
+                                    }
+                                    {
+                                        \item Les~ calculatrices~ \textbf{ne~ sont~ pas~ autorisées}
+                                    }
+                                
+                                \item Aucun~ candidat~ n'est~ admis~ à~ quitter~ la~ salle~ d'examen~ avant~ la~ fin~ de~ l'épreuve.                            
+                            \end{list}
+                            \group_end:
+                        }
+                }
+
+            \bigskip
+
+            \par \textsc{Recommandations~ spécifiques~ à~ l'épreuve}
+            \smallskip
+            \par \fbox
+                    {
+                        \parbox{\dimexpr\linewidth - 2\fboxrule-2\fboxsep\relax}    
+                            {
+                                \strut
+                                \RecoSpecifiques
+                                \strut
+                            }
+                    }
+
+            \iow_new:N \g_page_number_iow
+            \iow_new:N \g_question_number_iow
+            \tl_new:N \g_page_number_tl
+            \tl_new:N \g_question_number_tl
+            
+            \AtEndDocument
+                {
+                    \str_set:Nx \l_tmpa_str { \thepage }
+                    \bool_if:NTF \l_tmpa_bool
+                        {
+                            \directlua{
+                                pnumber = \l_tmpa_str - 2
+                                tex.print("\\def\\pagenumber{" .. pnumber .. "}")
+                            }
+                        }
+                        {
+                            \directlua{
+                                pnumber = \l_tmpa_str - 1
+                                tex.print("\\def\\pagenumber{" .. pnumber .. "}")
+                            }
+                        }
+                    \iow_open:Nn \g_page_number_iow { pagenumber.aux }
+                    \iow_now:Nx \g_page_number_iow { \pagenumber }
+                    \iow_close:N \g_page_number_iow
+                    
+                    \iow_open:Nn \g_question_number_iow { questionnumber.aux }
+                    \iow_now:Nx \g_question_number_iow { \int_use:N \g_question_number_int }
+                    \iow_close:N \g_question_number_iow
+                }
+                
+            \file_if_exist:nTF { pagenumber.aux }
+                { \file_get:nnN { pagenumber.aux } { } \g_page_number_tl }
+                { \typeout{pagenumber.aux file does not exist!} }
+            \file_if_exist:nTF { questionnumber.aux }
+                { \file_get:nnN { questionnumber.aux } { } \g_question_number_tl }
+                { \typeout{questionnumber.aux file does not exist!} }
+    
+            \par \textsc{Informations~ sur~ l'épreuve}
+            \smallskip
+            \par \fbox
+                    {
+                        \parbox{\dimexpr\linewidth - 2\fboxrule - 2\fboxsep\relax}
+                            {
+                                \bf Le~ sujet~ contient~ \tl_use:N \g_page_number_tl pages~ numérotées~ de~ 1~ à~ \tl_use:N \g_page_number_tl et~ comporte~ \tl_use:N \g_question_number_tl questions.
+
+                                \par Merci~ de~ vérifier~ au~ début~ de~ l’épreuve~ que~ le~ sujet~ est~ complet.%
+                            }
+                    }
+    } % \rectoannalePass
+    
+    
+    
+\NewDocumentCommand{\rectoannaleL}{}
+    {
+        \thispagestyle{empty}
+        \includegraphics[width=5cm]{upc_logo.png}
+
+        \begin{center}
+            \fontsize{22pt}{27pt}\selectfont
+            \vfill
+            Université~Paris~Cité\par
+            Faculté~de~Santé\par
+            Année~Universitaire~\annee\par
+
+            \vfill
+
+            \begin{bfseries}
+                Examen~ \filiere\par
+                \Module\ \UEnameShort\par
+                \UEname\par
+                \Session\par
+                {\normalfont Durée~ de~ l'épreuve~ :}~ \UEtime\par
+                (Temps~ majoré~ \UEtimeTT)
+            \end{bfseries}
+            \vfill
+        \end{center}
+
+        \fontsize{12pt}{14pt}\selectfont
+
+        \vfill
+
+        \par \textsc{À~lire~avant~de~commencer~l'épreuve}
+        \smallskip
+        \par \fbox
+                {
+                    \parbox{\dimexpr\linewidth - 2\fboxrule - 2\fboxsep\relax}
+                        {
+                            \strut
+                            \bfseries
+                            Vérifiez~ que~ les~ informations~ saisies~ sur~ votre~ grille~ QCM~ sont~ correctes~ :~ nom,~ prénom~ et~ numéro~ étudiant.
+    
+                            \par Les~ correcteurs~ liquides~ ou~ en~ ruban~ de~ type~ Blanco,~ Tipp-Ex,~ et~ autres~ sont~ interdits~ car~ chaque ~ question~ comporte~ une~ ligne~ de~ droit~ au~ remords.
+                            
+                            \par Seule~ l'utilisation~ du~ stylo~ à~ bille~ noir~ est~ autorisée~ pour~ cocher~ les~ grilles.
+                            \strut
+                        }
+                }
+
+        \bigskip
+
+        \par \textsc{Informations~ réglementaires}
+        \smallskip
+        \par \fbox
+                {
+                    \parbox{\dimexpr\linewidth - 2\fboxrule - 2\fboxsep\relax}
+                        {
+                            \group_begin:
+                            \begin{list}{\textbullet}
+                                {
+                                    \setlength{\leftmargin}{1em}
+                                    \setlength{\labelsep}{0.25em}
+                                    \setlength{\itemsep}{0em}
+                                    \setlength{\parsep}{0em}
+                                    \setlength{\topsep}{0em}
+                                }
+                                \item Les~ questions~ sans~ réponse~ seront~ considérées~ comme~ nulles.
+                                \item Une~ grille~ QCM~ est~ à~ remplir~ pour~ l’ensemble~ de~ l’épreuve.
+                                \item Veiller~ à~ remplir~ complètement~ toute~ la~ surface~ des~ cases~ choisies.
+                                \item Ne~ pas~ gratter,~ ne~ pas~ raturer,~ ne~ pas~ mettre~ de~ croix~ ni~ aucun~ autre~ signe.
+                                \item Toute~ fraude~ ou~ tentative~ de~ fraude~ fera~ l'objet~ de~ poursuites~ disciplinaires~ (Décret~ n$^\circ$92-657~ du~ 13~ juillet~ 1992).~ Tout~ signe~ distinctif~ porté~ sur~ la~ grille~ QCM~ pouvant~ indiquer~ sa~ provenance~ constitue~ une~ fraude.
+    
+                                \bool_if:nTF 
+                                    {
+                                        \str_if_eq_p:no { 4 } { \UEnumber } ||
+                                        \str_if_eq_p:no { 9 } { \UEnumber } ||
+                                        \str_if_eq_p:no { 11 } { \UEnumber } ||
+                                        \str_if_eq_p:no { 1.2 } { \UEnumber } ||
+                                        \str_if_eq_p:no { 4.2 } { \UEnumber }
+                                    }
+                                    {
+                                        \item Les~ calculatrices~ \textbf{sont~ autorisées}
+                                    }
+                                    {
+                                        \item Les~ calculatrices~ \textbf{ne~ sont~ pas~ autorisées}
+                                    }
+                                
+                                \item Aucun~ candidat~ n'est~ admis~ à~ quitter~ la~ salle~ d'examen~ avant~ la~ fin~ de~ l'épreuve.                            
+                            \end{list}
+                            \group_end:
+                        }
+                }
+
+            \bigskip
+
+            \par \textsc{Recommandations~ spécifiques~ à~ l'épreuve}
+            \smallskip
+            \par \fbox
+                    {
+                        \parbox{\dimexpr\linewidth - 2\fboxrule-2\fboxsep\relax}    
+                            {
+                                \strut
+                                \RecoSpecifiques
+                                \strut
+                            }
+                    }
+
+            \bigskip
+
+            \iow_new:N \g_page_number_iow
+            \iow_new:N \g_question_number_iow
+            \tl_new:N \g_page_number_tl
+            
+            \AtEndDocument
+                {
+                    \str_set:Nx \l_tmpa_str { \thepage }
+                    \bool_if:NTF \l_tmpa_bool
+                        {
+                            \directlua{
+                                pnumber = \l_tmpa_str - 2
+                                tex.print("\\def\\pagenumber{" .. pnumber .. "}")
+                            }
+                        }
+                        {
+                            \directlua{
+                                pnumber = \l_tmpa_str - 1
+                                tex.print("\\def\\pagenumber{" .. pnumber .. "}")
+                            }
+                        }
+                    \iow_open:Nn \g_page_number_iow { pagenumber.aux }
+                    \iow_now:Nx \g_page_number_iow { \pagenumber }
+                    \iow_close:N \g_page_number_iow
+                    
+                    \iow_open:Nn \g_question_number_iow { questionnumber.aux }
+                    \iow_now:Nx \g_question_number_iow { \int_use:N \g_question_number_int }
+                    \iow_close:N \g_question_number_iow
+                }
+                
+            \file_if_exist:nTF { pagenumber.aux }
+                { \file_get:nnN { pagenumber.aux } { } \g_page_number_tl }
+                { \typeout{pagenumber.aux file does not exist!} }
+            \file_if_exist:nTF { questionnumber.aux }
+                { \file_get:nnN { questionnumber.aux } { } \g_question_number_tl }
+                { \typeout{questionnumber.aux file does not exist!} }
+    
+            \par \textsc{Informations~ sur~ l'épreuve}
+            \smallskip
+            \par \fbox
+                    {
+                        \parbox{\dimexpr\linewidth - 2\fboxrule - 2\fboxsep\relax}
+                            {
+                                \bf Le~ sujet~ contient~ \tl_use:N \g_page_number_tl pages~ numérotées~ de~ 1~ à~ \tl_use:N \g_page_number_tl et~ comporte~ \tl_use:N \g_question_number_tl questions.
+
+                                \par Merci~ de~ vérifier~ au~ début~ de~ l’épreuve~ que~ le~ sujet~ est~ complet.%
+                            }
+                    }
+    } % \rectoannaleLAS
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+\NewDocumentCommand{\rectopolyQCMP}{}
+    {
+        \thispagestyle{empty}
+        \begin{center}
+            \fontsize{30pt}{35pt}\selectfont \Module\ {\color{\visu_color} \UEnameShort}
+            \medskip
+            \fontsize{38pt}{40pt}\selectfont
+            \hbox_set:Nn \l_tmpa_box { \textsc{\UEname} }
+            \dim_compare:nNnTF { \box_wd:N \l_tmpa_box } > { \linewidth }
+                {
+                    \par \resizebox{\linewidth}{!}{\color{\visu_color} \textsc{\UEname}}
+                }
+                {
+                    \par {\color{\visu_color} \textsc{\UEname}}
+                }
+            \medskip
+            \par {\fontsize{40pt}{40pt}\selectfont \normalfont \emoji{\UEemojiname}} \par
+
+            \vfill
+            
+            %%%%% LOGO ET UNIVERSITE
+            \includegraphics[width=9cm]{logo.png}\par
+
+            \bigskip
+
+            \medskip
+            
+            \fontsize{20pt}{25pt}\selectfont
+            \textsc{Tutorat~ \filiere}~ \annee\par
+            \textsc{Université~ Paris~ Cité}\par
+
+            \vfill
+
+            % \par \hdashrule{\linewidth}{1.5pt}{3pt}
+            \par \rule{\linewidth}{1.5pt}
+                \fontsize{25pt}{28pt}\selectfont
+                \vspace{1cm}
+                \par {\bfseries POLYCOPI\'E~ DE~ QCM~ \NumeroDuSupport}
+                \bigskip
+                \bool_if:NTF \g_correction_bool
+                    {
+                        \par Correction
+                    }
+                    {
+                        \par Sujet
+                    }
+                \vspace{\dimexpr 1cm-.45cm\relax}
+            % \par \hdashrule{\linewidth}{1.5pt}{3pt}
+            \par \rule{\linewidth}{1.5pt}
+
+            \vfill
+
+            \encadreAsso
+        \end{center}
+    } %%%% \rectopolyQCMPass
+    
+    
+    
+    
+\NewDocumentCommand{\rectopolyQCML}{}
+    {
+        \thispagestyle{empty}
+        \begin{center}
+            %%%%% LOGO ET UNIVERSITE
+            \includegraphics[width=3cm]{logo.png}\par
+            \fontsize{12pt}{14pt}\selectfont
+            \textsc{Tutorat~ \filiere}~ \annee\par 
+            \textsc{Université~ Paris~ Cité}\par
+           
+
+            \vfill
+
+            \fontsize{30pt}{35pt}\selectfont
+            \Module\ {\UEnumber}
+            \bigskip
+            \bigskip
+            \fontsize{38pt}{40pt}\selectfont
+            \hbox_set:Nn \l_tmpa_box { \textsc{\UEname} }
+            \dim_compare:nNnTF { \box_wd:N \l_tmpa_box } > { \linewidth }
+                {
+                    \par \resizebox{\linewidth}{!}{\textsc{\UEname}}
+                }
+                {
+                    \par {\textsc{\UEname}}
+                }
+
+            \bigskip
+
+            \par {\fontsize{40pt}{40pt}\selectfont \normalfont \emoji{\UEemojiname}}
+
+            \vfill
+
+            \par \hdashrule{\linewidth}{1.5pt}{3pt}
+            % \par \rule{\linewidth}{1.5pt}
+                \fontsize{25pt}{28pt}\selectfont
+                \vspace{1cm}
+                \par {\bfseries POLYCOPI\'E~ DE~ QCM~ \NumeroDuSupport}
+                \bigskip
+                \bool_if:NTF \g_correction_bool
+                    {
+                        \par Correction
+                    }
+                    {
+                        \par Sujet
+                    }
+                \vspace{\dimexpr 1cm-.45cm\relax}
+            \par \hdashrule{\linewidth}{1.5pt}{3pt}
+            % \par \rule{\linewidth}{1.5pt}
+
+            \vfill
+
+            \encadreAsso
+        \end{center}
+    } %%%% \rectopolyQCMLas
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+
+
+\NewDocumentCommand{\rectopolyExosP}{}
+    {
+        \thispagestyle{empty}
+        \begin{center}
+            \fontsize{30pt}{35pt}\selectfont \Module\ {\color{\visu_color} \UEnameShort}
+            \medskip
+            \fontsize{38pt}{40pt}\selectfont
+            \hbox_set:Nn \l_tmpa_box { \textsc{\UEname} }
+            \dim_compare:nNnTF { \box_wd:N \l_tmpa_box } > { \linewidth }
+                {
+                    \par \resizebox{\linewidth}{!}{\color{\visu_color} \textsc{\UEname}}
+                }
+                {
+                    \par {\color{\visu_color} \textsc{\UEname}}
+                }
+            \medskip
+            \par {\fontsize{40pt}{40pt}\selectfont \normalfont \emoji{\UEemojiname}} \par
+
+            \vfill
+            
+            %%%%% LOGO ET UNIVERSITE
+            \includegraphics[width=9cm]{logo.png}\par
+
+            \bigskip
+
+            \medskip
+            
+            \fontsize{20pt}{25pt}\selectfont
+            \textsc{Tutorat~ \filiere}~ \annee\par
+            \textsc{Université~ Paris~ Cité}\par
+
+            \vfill
+
+            % \par \hdashrule{\linewidth}{1.5pt}{3pt}
+            \par \rule{\linewidth}{1.5pt}
+                \fontsize{25pt}{28pt}\selectfont
+                \vspace{1cm}
+                \par {\bfseries POLYCOPI\'E~ D'EXERCICES~ \NumeroDuSupport}
+                \bigskip
+                \bool_if:NTF \g_correction_bool
+                    {
+                        \par Correction
+                    }
+                    {
+                        \par Sujet
+                    }
+                \vspace{\dimexpr 1cm-.45cm\relax}
+            % \par \hdashrule{\linewidth}{1.5pt}{3pt}
+            \par \rule{\linewidth}{1.5pt}
+
+            \vfill
+
+            \encadreAsso
+        \end{center}
+    } %%%% \rectopolyExosP
+    
+\NewDocumentCommand{\rectopolyExosL}{}
+    {
+        \thispagestyle{empty}
+        \begin{center}
+            %%%%% LOGO ET UNIVERSITE
+            \includegraphics[width=3cm]{logo.png}\par
+            \fontsize{12pt}{14pt}\selectfont
+            \textsc{Tutorat~ \filiere}~ \annee\par 
+            \textsc{Université~ Paris~ Cité}\par 
+            
+
+            \vfill
+
+            \fontsize{30pt}{35pt}\selectfont
+            \Module\ {\UEnumber}
+            \bigskip
+            \bigskip
+            \fontsize{38pt}{40pt}\selectfont
+            \hbox_set:Nn \l_tmpa_box { \textsc{\UEname} }
+            \dim_compare:nNnTF { \box_wd:N \l_tmpa_box } > { \linewidth }
+                {
+                    \par \resizebox{\linewidth}{!}{\textsc{\UEname}}
+                }
+                {
+                    \par {\textsc{\UEname}}
+                }
+
+            \bigskip
+            
+            \par {\fontsize{40pt}{40pt}\selectfont \normalfont \emoji{\UEemojiname}}
+
+            \vfill
+
+            \par \hdashrule{\linewidth}{1.5pt}{3pt}
+            % \par \rule{\linewidth}{1.5pt}
+                \fontsize{25pt}{28pt}\selectfont
+                \vspace{1cm}
+                \par {\bfseries POLYCOPI\'E~ D'EXERCICES~ \NumeroDuSupport}
+                \bigskip
+                \bool_if:NTF \g_correction_bool
+                    {
+                        \par Correction
+                    }
+                    {
+                        \par Sujet
+                    }
+                \vspace{\dimexpr 1cm-.45cm\relax}
+            \par \hdashrule{\linewidth}{1.5pt}{3pt}
+            % \par \rule{\linewidth}{1.5pt}
+
+            \vfill
+
+            \encadreAsso
+        \end{center}
+    } %%%% \rectopolyExosL
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+
+
+\NewDocumentCommand{\rectoextraP}{}
+    {
+        \thispagestyle{empty}
+        \begin{center}
+            \fontsize{30pt}{35pt}\selectfont \Module\ {\color{\visu_color} \UEnameShort}
+            \medskip
+            \fontsize{38pt}{40pt}\selectfont
+            \hbox_set:Nn \l_tmpa_box { \textsc{\UEname} }
+            \dim_compare:nNnTF { \box_wd:N \l_tmpa_box } > { \linewidth }
+                {
+                    \par \resizebox{\linewidth}{!}{\color{\visu_color} \textsc{\UEname}}
+                }
+                {
+                    \par {\color{\visu_color} \textsc{\UEname}}
+                }
+            \medskip
+            \par {\fontsize{40pt}{40pt}\selectfont \normalfont \emoji{\UEemojiname}} \par
+
+            \vfill
+            
+            %%%%% LOGO ET UNIVERSITE
+            \includegraphics[width=9cm]{logo.png}\par
+
+            \bigskip
+
+            \medskip
+            
+            \fontsize{20pt}{25pt}\selectfont
+            \textsc{Tutorat~ \filiere}~ \annee\par
+            \textsc{Université~ Paris~ Cité}\par
+
+            \vfill
+
+            \par \rule{\linewidth}{1.5pt}
+                \vspace{1cm}
+                \fontsize{28pt}{30pt}\selectfont
+                \par {\bfseries \TitreExtra}
+                \bigskip
+                \fontsize{25pt}{28pt}\selectfont
+                \par \SousTitre
+                \vspace{\dimexpr 1cm-.45cm\relax}
+            \par \rule{\linewidth}{1.5pt}
+
+            \vfill
+            
+            \par \encadreAsso
+        \end{center}
+    } % \rectoextraP
+    
+\NewDocumentCommand{\rectoextraL}{}
+    {
+        \thispagestyle{empty}
+        \begin{center}
+            %%%%% LOGO ET UNIVERSITE
+            \includegraphics[width=3cm]{logo.png}
+            \fontsize{12pt}{14pt}\selectfont
+            \par \textsc{Tutorat~ \filiere}~ \annee
+            \par \textsc{Université~ Paris~ Cité}
+            \par 
+
+            \vfill
+
+            \fontsize{30pt}{35pt}\selectfont
+            \Module\ {\UEnumber}
+            \bigskip
+            \bigskip
+            \fontsize{38pt}{40pt}\selectfont
+            \hbox_set:Nn \l_tmpa_box { \textsc{\UEname} }
+            \dim_compare:nNnTF { \box_wd:N \l_tmpa_box } > { \linewidth }
+                {
+                    \par \resizebox{\linewidth}{!}{\textsc{\UEname}}
+                }
+                {
+                    \par {\textsc{\UEname}}
+                }
+
+            \bigskip
+            
+            \par {\fontsize{40pt}{40pt}\selectfont \normalfont \emoji{\UEemojiname}}
+
+            \vfill
+
+            \par \rule{\linewidth}{1.5pt}
+                \vspace{1cm}
+                \fontsize{28pt}{30pt}\selectfont
+                \par {\bfseries \TitreExtra}
+                \bigskip
+                \fontsize{25pt}{28pt}\selectfont
+                \par \SousTitre
+                \vspace{\dimexpr 1cm-.45cm\relax}
+            \par \rule{\linewidth}{1.5pt}
+
+            \vfill
+            
+            \par \encadreAsso
+        \end{center}
+    } % \rectoextraL
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+\NewDocumentCommand{\rectoficheP}{}
+    {
+        \thispagestyle{empty}
+        \begin{center}
+            \fontsize{30pt}{35pt}\selectfont \Module\ {\color{\visu_color} \UEnameShort}
+            \medskip
+            \fontsize{38pt}{40pt}\selectfont
+            \hbox_set:Nn \l_tmpa_box { \textsc{\UEname} }
+            \dim_compare:nNnTF { \box_wd:N \l_tmpa_box } > { \linewidth }
+                {
+                    \par \resizebox{\linewidth}{!}{\color{\visu_color} \textsc{\UEname}}
+                }
+                {
+                    \par {\color{\visu_color} \textsc{\UEname}}
+                }
+            \medskip
+            \par {\fontsize{40pt}{40pt}\selectfont \normalfont \emoji{\UEemojiname}} \par
+
+            \vfill
+            
+            %%%%% LOGO ET UNIVERSITE
+            \includegraphics[width=9cm]{logo.png}\par
+
+            \bigskip
+
+            \medskip
+            
+            \fontsize{20pt}{25pt}\selectfont
+            \textsc{Tutorat~ \filiere}~ \annee\par
+            \textsc{Université~ Paris~ Cité}\par
+
+            \vfill
+
+            \par \rule{\linewidth}{1.5pt}
+                \fontsize{25pt}{28pt}\selectfont
+                \vspace{1cm}
+                \par {\bfseries FICHE~ \NumeroDuSupport}
+                \bigskip
+                \par {\bfseries \SousTitre}
+                \vspace{\dimexpr 1cm-.45cm\relax}
+            \par \rule{\linewidth}{1.5pt}
+
+            \vfill
+
+            % \begin{minipage}{\linewidth}
+            % \fontsize{10pt}{12pt}\selectfont
+            % \par Il~ s'agit~ d'une~ fiche~ récapitulative~ non~ exhaustive~ des~ notions~ essentielles~ concernant~ vos~ cours.~ Cela~ ne~ remplace~ pas~ les~ diaporamas~ de~ cours~ et~ vos~ notes~ se~ rapportant~ aux~ explications~ des~ professeurs.
+            % \par Il~ est~ primordial~ d'avoir~ compris~ ces~ notions~ avant~ tout~ "apprentissage~ par~ coeur"~ qui~ se~ révélerait~ absolument~ improductif.~ Le~ meilleur~ moyen~ de~ réussir~ reste~ la~ compréhension,~ un~ apprentissage~ consciencieux~ des~ diapositives~ et~ un~ entraînement~ régulier~ (nous~ vous~ conseillons~ de~ vous~ rendre~ régulièrement~ aux~ examens~ blancs~ du~ tutorat).
+            % \end{minipage}
+            
+            \medskip
+            
+            \par \encadreAsso
+        \end{center}
+    } % \rectoficheP
+    
+\NewDocumentCommand{\rectoficheL}{}
+    {
+        \thispagestyle{empty}
+        \begin{center}
+            %%%%% LOGO ET UNIVERSITE
+            \includegraphics[width=3cm]{logo.png}\par
+            \fontsize{12pt}{14pt}\selectfont
+            \textsc{Tutorat~ \filiere}~ \annee\par
+            \textsc{Université~ Paris~ Cité}\par
+            
+
+            \vfill
+
+            \fontsize{30pt}{35pt}\selectfont \Module\ \UEnumber
+            \bigskip
+            \bigskip
+            \fontsize{38pt}{40pt}\selectfont
+            \hbox_set:Nn \l_tmpa_box { \textsc{\UEname} }
+            \dim_compare:nNnTF { \box_wd:N \l_tmpa_box } > { \linewidth }
+                {
+                    \par \resizebox{\linewidth}{!}{\textsc{\UEname}}
+                }
+                {
+                    \par \textsc{\UEname}
+                }
+
+            \bigskip 
+            
+            \par {\fontsize{40pt}{40pt}\selectfont \normalfont \emoji{\UEemojiname}}
+
+            \vfill
+
+            \par \rule{\linewidth}{1.5pt}
+                \fontsize{25pt}{28pt}\selectfont
+                \vspace{1cm}
+                \par {\bfseries FICHE~ DE~ COURS~ n$^\circ$ \NumeroDuSupport}
+                \bigskip
+                \par \SousTitre
+                \vspace{\dimexpr 1cm-.45cm\relax}
+            \par \rule{\linewidth}{1.5pt}
+
+            \vfill
+
+            \begin{minipage}{\linewidth}
+            \fontsize{10pt}{12pt}\selectfont
+            \par Il~ s'agit~ d'une~ fiche~ récapitulative~ non~ exhaustive~ des~ notions~ essentielles~ concernant~ vos~ cours.~ Cela~ ne~ remplace~ pas~ les~ diaporamas~ de~ cours~ et~ vos~ notes~ se~ rapportant~ aux~ explications~ des~ professeurs.
+            \par Il~ est~ primordial~ d'avoir~ compris~ ces~ notions~ avant~ tout~ "apprentissage~ par~ coeur"~ qui~ se~ révélerait~ absolument~ improductif.~ Le~ meilleur~ moyen~ de~ réussir~ reste~ la~ compréhension,~ un~ apprentissage~ consciencieux~ des~ diapositives~ et~ un~ entraînement~ régulier~ (nous~ vous~ conseillons~ de~ vous~ rendre~ régulièrement~ aux~ examens~ blancs~ du~ tutorat).
+            \end{minipage}
+            
+            \medskip
+            
+            \par \encadreAsso
+        \end{center}
+    } % \rectoficheL
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+\NewDocumentCommand{\rectoGTP}{}
+    {
+        \thispagestyle{empty}
+        \begin{center}
+            \fontsize{30pt}{35pt}\selectfont \Module\ {\color{\visu_color} \UEnameShort}
+            \medskip
+            \fontsize{38pt}{40pt}\selectfont
+            \hbox_set:Nn \l_tmpa_box { \textsc{\UEname} }
+            \dim_compare:nNnTF { \box_wd:N \l_tmpa_box } > { \linewidth }
+                {
+                    \par \resizebox{\linewidth}{!}{\color{\visu_color} \textsc{\UEname}}
+                }
+                {
+                    \par {\color{\visu_color} \textsc{\UEname}}
+                }
+            \medskip
+            \par {\fontsize{40pt}{40pt}\selectfont \normalfont \emoji{\UEemojiname}} \par
+
+            \vfill
+            
+            %%%%% LOGO ET UNIVERSITE
+            \includegraphics[width=9cm]{logo.png}\par
+
+            \bigskip
+
+            \medskip
+            
+            \fontsize{20pt}{25pt}\selectfont
+            \textsc{Tutorat~ \filiere}~ \annee\par
+            \textsc{Université~ Paris~ Cité}\par
+
+            \vfill
+
+            % \par \hdashrule{\linewidth}{1.5pt}{3pt}
+            \par \rule{\linewidth}{1.5pt}
+                \fontsize{30pt}{30pt}\selectfont
+                \vspace{1cm}
+                \par {\bfseries GT~ \NumeroDuSupport}
+                \bigskip
+                \par {\fontsize{23pt}{23pt}\selectfont \text_uppercase:n { \str_use:N \SujetOuCorrection }}
+                    
+                \vspace{\dimexpr 1cm-.45cm\relax}
+            % \par \hdashrule{\linewidth}{1.5pt}{3pt}
+            \par \rule{\linewidth}{1.5pt}
+
+            \vfill
+
+            \encadreAsso
+        \end{center}
+    } %%%% \rectoGTP
+    
+\NewDocumentCommand{\rectoGTL}{}
+    {
+        \thispagestyle{empty}
+        \begin{center}
+            %%%%% LOGO ET UNIVERSITE
+            \includegraphics[width=3cm]{logo.png}\par
+            \fontsize{12pt}{14pt}\selectfont
+            \textsc{Tutorat~ \filiere}~ \annee\par
+            \textsc{Université~ Paris~ Cité}\par
+            
+
+            \vfill
+
+            \fontsize{30pt}{35pt}\selectfont
+            \Module\ {\UEnumber}
+            \bigskip
+            \bigskip
+            \fontsize{38pt}{40pt}\selectfont
+            \hbox_set:Nn \l_tmpa_box { \textsc{\UEname} }
+            \dim_compare:nNnTF { \box_wd:N \l_tmpa_box } > { \linewidth }
+                {
+                    \par \resizebox{\linewidth}{!}{\textsc{\UEname}}
+                }
+                {
+                    \par {\textsc{\UEname}}
+                }
+
+            \bigskip
+            
+            \par {\fontsize{40pt}{40pt}\selectfont \emoji{\UEemojiname}}
+
+            \vfill
+
+            \par \hdashrule{\linewidth}{1.5pt}{3pt}
+            % \par \rule{\linewidth}{1.5pt}
+                \fontsize{30pt}{30pt}\selectfont
+                \vspace{1cm}
+                \par {\bfseries GT~ \NumeroDuSupport}
+                \bigskip
+                \par {\fontsize{23pt}{23pt}\selectfont \text_uppercase:n { \str_use:N \SujetOuCorrection }}
+                    
+                \vspace{\dimexpr 1cm-.45cm\relax}
+            \par \hdashrule{\linewidth}{1.5pt}{3pt}
+            % \par \rule{\linewidth}{1.5pt}
+
+            \vfill
+
+            \encadreAsso
+        \end{center}
+    } %%%% \rectoGTL
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+\NewDocumentCommand{\rectotutoP}{}
+    {
+        \thispagestyle{empty}
+        \begin{center}
+            %%%%% LOGO ET UNIVERSITE
+            \includegraphics[width=3cm]{logo.png}
+            \fontsize{12pt}{14pt}\selectfont
+            \par Association~pour~l{'}Accès~Santé~–~Université~Paris~Cité
+            \par Année~Universitaire~\str_use:N \annee
+
+            \vfill
+
+            \begin{bfseries}
+                %%%%%% SUJET OU CORRECTION
+                \fontsize{25pt}{25pt}\selectfont
+                {\color{\visu_color} \text_uppercase:n { \str_use:N \SujetOuCorrection }}    
+    
+                \vfill
+
+                %%%%%% EXAMEN BLANC
+                \fontsize{20pt}{20pt}\selectfont
+                Examen~Blanc~n$^\circ${\color{\visu_color} \str_use:N \NumeroDuSupport\ \filiere}
+                
+                \vfill
+
+                %%%%%% UE CONCERNEE
+                \fontsize{26pt}{26pt}\selectfont
+                \par \Module\ {\color{\visu_color} \UEnameShort\ :~\UEname}
+                \bigskip
+                \par {\normalfont\fontsize{35pt}{35pt} \emoji{\str_use:N \UEemojiname}}
+                
+                \vfill
+
+                %%%%% DUREE DE L'EPREUVE, TIERS TEMPS OU NON
+                \fontsize{19pt}{19pt}\selectfont
+                \bool_if:NTF \g_tierstemps_bool
+                    {
+                        \par {\normalfont Durée~de~l'épreuve~majorée~:}~{\color{\visu_color} \str_use:N \UEtimeTT}
+                    }
+                    {
+                        \par {\normalfont Durée~de~l'épreuve~:}~{\color{\visu_color} \str_use:N \UEtime}
+                    }
+            \end{bfseries}
+        \end{center}
+
+        \fontsize{12pt}{14pt}\selectfont
+
+        \vfill
+
+        \par \textsc{A~lire~avant~de~commencer~l'épreuve}
+        \smallskip
+        \par \fbox
+                {
+                    \parbox{\dimexpr\linewidth - 2\fboxrule - 2\fboxsep\relax}
+                        {
+                            \strut
+                            \bfseries
+                            Vérifiez~ que~ les~ informations~ saisies~ sur~ votre~ grille~ QCM~ sont~ correctes~ :~ nom,~ prénom~ et~ numéro~ étudiant.
+    
+                            \par Les~ correcteurs~ liquides~ ou~ en~ ruban~ de~ type~ Blanco,~ Tipp-Ex,~ et~ autres~ sont~ interdits~ car~ chaque ~ question~ comporte~ une~ ligne~ de~ droit~ au~ remords.
+                            
+                            \par Seule~ l'utilisation~ du~ stylo~ à~ bille~ noir~ est~ autorisée~ pour~ cocher~ les~ grilles.
+                            \strut
+                        }
+                }
+
+        \bigskip
+
+        \par \textsc{Informations~ réglementaires}
+        \smallskip
+        \par \fbox
+                {
+                    \parbox{\dimexpr\linewidth - 2\fboxrule - 2\fboxsep\relax}
+                        {
+                            \group_begin:
+                            \begin{list}{\textbullet}
+                                {
+                                    \setlength{\leftmargin}{1em}
+                                    \setlength{\labelsep}{0.25em}
+                                    \setlength{\itemsep}{0em}
+                                    \setlength{\parsep}{0em}
+                                    \setlength{\topsep}{0em}
+                                }
+                                \item Les~ questions~ sans~ réponse~ seront~ considérées~ comme~ nulles.
+                                \item Une~ grille~ QCM~ est~ à~ remplir~ pour~ l’ensemble~ de~ l’épreuve.
+                                \item Veiller~ à~ remplir~ complètement~ toute~ la~ surface~ des~ cases~ choisies.
+                                \item Ne~ pas~ gratter,~ ne~ pas~ raturer,~ ne~ pas~ mettre~ de~ croix~ ni~ aucun~ autre~ signe.
+                                \item Toute~ fraude~ ou~ tentative~ de~ fraude~ fera~ l'objet~ de~ poursuites~ disciplinaires~ (Décret~ n$^\circ$92-657~ du~ 13~ juillet~ 1992).~ Tout~ signe~ distinctif~ porté~ sur~ la~ grille~ QCM~ pouvant~ indiquer~ sa~ provenance~ constitue~ une~ fraude.
+    
+                                \bool_if:nTF 
+                                    {
+                                        \str_if_eq_p:no { 4 } { \UEnumber } ||
+                                        \str_if_eq_p:no { 9 } { \UEnumber } ||
+                                        \str_if_eq_p:no { 11 } { \UEnumber } ||
+                                        \str_if_eq_p:no { 1.2 } { \UEnumber } ||
+                                        \str_if_eq_p:no { 4.2 } { \UEnumber }
+                                    }
+                                    {
+                                        \item Les~ calculatrices~ \textbf{{\color{\visu_color} sont}~ autorisées}
+                                    }
+                                    {
+                                        \item Les~ calculatrices~ \textbf{{\color{\visu_color} ne~ sont~ pas}~ autorisées}
+                                    }
+                                
+                                \item Aucun~ candidat~ n'est~ admis~ à~ quitter~ la~ salle~ d'examen~ avant~ la~ fin~ de~ l'épreuve.                            
+                            \end{list}
+                            \group_end:
+                        }
+                }
+
+            \bigskip
+
+            \par \textsc{Recommandations~ spécifiques~ à~ l'épreuve}
+            \smallskip
+            \par \fbox
+                    {
+                        \parbox{\dimexpr\linewidth - 2\fboxrule-2\fboxsep\relax}    
+                            {
+                                \strut
+                                \RecoSpecifiques
+                                \strut
+                            }
+                    }
+
+            \bigskip
+
+            \iow_new:N \g_page_number_iow
+            \iow_new:N \g_question_number_iow
+            \tl_new:N \g_page_number_tl
+            
+            \AtEndDocument
+                {
+                    \str_set:Nx \l_tmpa_str { \thepage }
+                    \bool_if:NTF \l_tmpa_bool
+                        {
+                            \directlua{
+                                pnumber = \l_tmpa_str - 2
+                                tex.print("\\def\\pagenumber{" .. pnumber .. "}")
+                            }
+                        }
+                        {
+                            \directlua{
+                                pnumber = \l_tmpa_str - 1
+                                tex.print("\\def\\pagenumber{" .. pnumber .. "}")
+                            }
+                        }
+                    \iow_open:Nn \g_page_number_iow { pagenumber.aux }
+                    \iow_now:Nx \g_page_number_iow { \pagenumber }
+                    \iow_close:N \g_page_number_iow
+                    
+                    \iow_open:Nn \g_question_number_iow { questionnumber.aux }
+                    \iow_now:Nx \g_question_number_iow { \int_use:N \g_question_number_int }
+                    \iow_close:N \g_question_number_iow
+                }
+                
+            \file_if_exist:nTF { pagenumber.aux }
+                { \file_get:nnN { pagenumber.aux } { } \g_page_number_tl }
+                { \typeout{pagenumber.aux file does not exist!} }
+            \file_if_exist:nTF { questionnumber.aux }
+                { \file_get:nnN { questionnumber.aux } { } \g_question_number_tl }
+                { \typeout{questionnumber.aux file does not exist!} }
+    
+            \par \textsc{Informations~ sur~ l'épreuve}
+            \smallskip
+            \par \fbox
+                    {
+                        \parbox{\dimexpr\linewidth - 2\fboxrule - 2\fboxsep\relax}
+                            {
+                                \bf Le~ sujet~ contient~{\color{\visu_color} \tl_use:N \g_page_number_tl }pages~ numérotées~ de~ 1~ à~{\color{\visu_color} \tl_use:N \g_page_number_tl }et~ comporte~{\color{\visu_color} \tl_use:N \g_question_number_tl }questions.
+
+                                \par Merci~ de~ vérifier~ au~ début~ de~ l’épreuve~ que~ le~ sujet~ est~ complet.%
+                            }
+                    }
+    } % \rectotutoP
+    
+\NewDocumentCommand{\rectotutoL}{}
+    {
+        \thispagestyle{empty}
+        \begin{center}
+            %%%%% LOGO ET UNIVERSITE
+            \includegraphics[width=3cm]{logo.png}
+            \fontsize{12pt}{14pt}\selectfont
+            \par Association~pour~l{'}Accès~Santé~–~Université~Paris~Cité
+            \par Année~Universitaire~\str_use:N \annee
+
+            \vfill
+
+            \begin{bfseries}
+                %%%%%% SUJET OU CORRECTION
+                \fontsize{25pt}{25pt}\selectfont
+                \text_uppercase:n { \str_use:N \SujetOuCorrection }
+    
+                \vfill
+
+                %%%%%% EXAMEN BLANC
+                \fontsize{20pt}{20pt}\selectfont
+                Examen~Blanc~ \filiere\ n$^\circ$\str_use:N \NumeroDuSupport
+                
+                \vfill
+
+                %%%%%% UE CONCERNEE
+                \fontsize{26pt}{26pt}\selectfont
+                \par \Module\ \UEnumber\ :~\UEname
+                \bigskip
+                \par {\normalfont\fontsize{35pt}{35pt} \emoji{\str_use:N \UEemojiname}}
+                
+                \vfill
+
+                %%%%% DUREE DE L'EPREUVE, TIERS TEMPS OU NON
+                \fontsize{19pt}{19pt}\selectfont
+                \bool_if:NTF \g_tierstemps_bool
+                    {
+                        \par {\normalfont Durée~de~l'épreuve~majorée~:}~\str_use:N \UEtimeTT
+                    }
+                    {
+                        \par {\normalfont Durée~de~l'épreuve~:}~\str_use:N \UEtime
+                    }
+            \end{bfseries}
+        \end{center}
+
+        \fontsize{12pt}{14pt}\selectfont
+
+        \vfill
+
+        \par \textsc{A~lire~avant~de~commencer~l'épreuve}
+        \smallskip
+        \par \fbox
+                {
+                    \parbox{\dimexpr\linewidth - 2\fboxrule - 2\fboxsep\relax}
+                        {
+                            \strut
+                            \bfseries
+                            Vérifiez~ que~ les~ informations~ saisies~ sur~ votre~ grille~ QCM~ sont~ correctes~ :~ nom,~ prénom~ et~ numéro~ étudiant.
+    
+                            \par Les~ correcteurs~ liquides~ ou~ en~ ruban~ de~ type~ Blanco,~ Tipp-Ex,~ et~ autres~ sont~ interdits~ car~ chaque ~ question~ comporte~ une~ ligne~ de~ droit~ au~ remords.
+                            
+                            \par Seule~ l'utilisation~ du~ stylo~ à~ bille~ noir~ est~ autorisée~ pour~ cocher~ les~ grilles.
+                            \strut
+                        }
+                }
+
+        \bigskip
+
+        \par \textsc{Informations~ réglementaires}
+        \smallskip
+        \par \fbox
+                {
+                    \parbox{\dimexpr\linewidth - 2\fboxrule - 2\fboxsep\relax}
+                        {
+                            \group_begin:
+                            \begin{list}{\textbullet}
+                                {
+                                    \setlength{\leftmargin}{1em}
+                                    \setlength{\labelsep}{0.25em}
+                                    \setlength{\itemsep}{0em}
+                                    \setlength{\parsep}{0em}
+                                    \setlength{\topsep}{0em}
+                                }
+                                \item Les~ questions~ sans~ réponse~ seront~ considérées~ comme~ nulles.
+                                \item Une~ grille~ QCM~ est~ à~ remplir~ pour~ l’ensemble~ de~ l’épreuve.
+                                \item Veiller~ à~ remplir~ complètement~ toute~ la~ surface~ des~ cases~ choisies.
+                                \item Ne~ pas~ gratter,~ ne~ pas~ raturer,~ ne~ pas~ mettre~ de~ croix~ ni~ aucun~ autre~ signe.
+                                \item Toute~ fraude~ ou~ tentative~ de~ fraude~ fera~ l'objet~ de~ poursuites~ disciplinaires~ (Décret~ n$^\circ$92-657~ du~ 13~ juillet~ 1992).~ Tout~ signe~ distinctif~ porté~ sur~ la~ grille~ QCM~ pouvant~ indiquer~ sa~ provenance~ constitue~ une~ fraude.
+    
+                                \bool_if:nTF 
+                                    {
+                                        \str_if_eq_p:no { 4 } { \UEnumber } ||
+                                        \str_if_eq_p:no { 9 } { \UEnumber } ||
+                                        \str_if_eq_p:no { 11 } { \UEnumber } ||
+                                        \str_if_eq_p:no { 1.2 } { \UEnumber } ||
+                                        \str_if_eq_p:no { 4.2 } { \UEnumber }
+                                    }
+                                    {
+                                        \item Les~ calculatrices~ \textbf{sont~ autorisées}
+                                    }
+                                    {
+                                        \item Les~ calculatrices~ \textbf{ne~ sont~ pas~ autorisées}
+                                    }
+                                
+                                \item Aucun~ candidat~ n'est~ admis~ à~ quitter~ la~ salle~ d'examen~ avant~ la~ fin~ de~ l'épreuve.                            
+                            \end{list}
+                            \group_end:
+                        }
+                }
+
+            \bigskip
+
+            \par \textsc{Recommandations~ spécifiques~ à~ l'épreuve}
+            \smallskip
+            \par \fbox
+                    {
+                        \parbox{\dimexpr\linewidth - 2\fboxrule-2\fboxsep\relax}    
+                            {
+                                \strut
+                                \str_use:N \RecoSpecifiques
+                                \strut
+                            }
+                    }
+
+            \bigskip
+
+            \iow_new:N \g_page_number_iow
+            \iow_new:N \g_question_number_iow
+            \tl_new:N \g_page_number_tl
+            
+            \AtEndDocument
+                {
+                    \str_set:Nx \l_tmpa_str { \thepage }
+                    \bool_if:NTF \l_tmpa_bool
+                        {
+                            \directlua{
+                                pnumber = \l_tmpa_str - 2
+                                tex.print("\\def\\pagenumber{" .. pnumber .. "}")
+                            }
+                        }
+                        {
+                            \directlua{
+                                pnumber = \l_tmpa_str - 1
+                                tex.print("\\def\\pagenumber{" .. pnumber .. "}")
+                            }
+                        }
+                    \iow_open:Nn \g_page_number_iow { pagenumber.aux }
+                    \iow_now:Nx \g_page_number_iow { \pagenumber }
+                    \iow_close:N \g_page_number_iow
+                    
+                    \iow_open:Nn \g_question_number_iow { questionnumber.aux }
+                    \iow_now:Nx \g_question_number_iow { \int_use:N \g_question_number_int }
+                    \iow_close:N \g_question_number_iow
+                }
+                
+            \file_if_exist:nTF { pagenumber.aux }
+                { \file_get:nnN { pagenumber.aux } { } \g_page_number_tl }
+                { \typeout{pagenumber.aux file does not exist!} }
+            \file_if_exist:nTF { questionnumber.aux }
+                { \file_get:nnN { questionnumber.aux } { } \g_question_number_tl }
+                { \typeout{questionnumber.aux file does not exist!} }
+    
+            \par \textsc{Informations~ sur~ l'épreuve}
+            \smallskip
+            \par \fbox
+                    {
+                        \parbox{\dimexpr\linewidth - 2\fboxrule - 2\fboxsep\relax}
+                            {
+                                \bf Le~ sujet~ contient~ \tl_use:N \g_page_number_tl pages~ numérotées~ de~ 1~ à~ \tl_use:N \g_page_number_tl et~ comporte~ \tl_use:N \g_question_number_tl questions.
+
+                                \par Merci~ de~ vérifier~ au~ début~ de~ l’épreuve~ que~ le~ sujet~ est~ complet.%
+                            }
+                    }
+    } % \rectotutoL
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+\NewDocumentCommand{\encadreAssoP}{}
+    {
+        \begin{tcolorbox}[
+            colback=white,
+            colframe=\visu_color,
+            arc=3pt,
+        ]
+            \centering
+                        
+            \resizebox
+                {\dimexpr \linewidth - 2\fboxsep\relax}
+                {!}
+                {
+                    \fontsize{20pt}{20pt}\selectfont
+                    \bf ASSOCIATION~ POUR~ L{'}ACCÈS~ SANTÉ~ --~ UNIVERSITÉ~ PARIS~ CITÉ
+                }
+            
+            \bigskip
+
+            \fontsize{18pt}{18pt}\selectfont
+            \par \text{A2SUP}
+            
+            \medskip
+
+            \fontsize{13pt}{15pt}\selectfont
+            \par Bureau~ T203~ –~ \href{https://maps.app.goo.gl/21gyrDiNQt6ikTCn7}{45~ rue~ des~ Saints-Pères,~ 75006~ Paris}
+            
+            % \par \href{https://drive.google.com/file/d/1Xv6cpGgC0LXmQeqRaWwzA-bXUfORKstL/view?usp=share_link}{Bureau~ TP15}~ –~ \href{https://maps.app.goo.gl/pXwYtdxaQ6KWriaZA}{4~ avenue~ de~ l’Observatoire,~ 75006~ Paris}
+            
+            \par Bureau~ 101~ –~ \href{https://maps.app.goo.gl/GASjVHM45TMCeKiT8}{15~ rue~ de~ l’Ecole~ de~ Médecine,~ 75006~ Paris}
+            
+            \medskip
+
+            \par 01~ 42~ 86~ 40~ 59
+
+            \medskip
+            
+            \par \href{https://www.a2sup.fr/}{www.a2sup.fr}
+        \end{tcolorbox}
+    } % \encadreAssoP
+    
+\NewDocumentCommand{\encadreAssoL}{}
+    {
+        \begin{tcolorbox}[
+            enhanced,
+            colback=pink!80!violet!40,
+            colframe=white,
+            arc=3pt,
+            borderline={1pt}{0pt}{green!60!black,dashed}
+        ]
+            \centering
+                        
+            \resizebox
+                {\dimexpr \linewidth - 2\fboxsep\relax}
+                {!}
+                {
+                    \fontsize{20pt}{20pt}\selectfont
+                    \bf ASSOCIATION~ POUR~ L{'}ACCÈS~ SANTÉ~ --~ UNIVERSITÉ~ PARIS~ CITÉ
+                }
+            
+            \bigskip
+
+            \fontsize{18pt}{18pt}\selectfont
+            \par \text{A2SUP}
+            
+            \medskip
+
+            \fontsize{13pt}{15pt}\selectfont
+            \par Bureau~ T203~ –~ \href{https://maps.app.goo.gl/21gyrDiNQt6ikTCn7}{45~ rue~ des~ Saints-Pères,~ 75006~ Paris}
+            
+            \par \href{https://drive.google.com/file/d/1Xv6cpGgC0LXmQeqRaWwzA-bXUfORKstL/view?usp=share_link}{Bureau~ TP15}~ –~ \href{https://maps.app.goo.gl/pXwYtdxaQ6KWriaZA}{4~ avenue~ de~ l’Observatoire,~ 75006~ Paris}
+            
+            \par Bureau~ 101~ –~ \href{https://maps.app.goo.gl/GASjVHM45TMCeKiT8}{15~ rue~ de~ l’Ecole~ de~ Médecine,~ 75006~ Paris}
+            
+            \medskip
+
+            \par 01~ 42~ 86~ 40~ 59
+
+            \medskip
+            
+            \par \href{https://www.a2sup.fr/}{www.a2sup.fr}
+        \end{tcolorbox}
+    } % \encadreAssoL
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\tl_new:N \g_question_memoire_tl
+
+\NewDocumentEnvironment{memoire}{ +b }
+    {
+        \group_begin:
+            \bool_set_false:N \g_correction_bool
+            \tl_gset:Nn \g_question_memoire_tl { #1 }
+            #1
+        \group_end:
+    }
+    {}
+
+
+\NewDocumentCommand{\reponse}{}
+    {
+        \group_begin:
+            \bool_set_true:N \g_correction_bool
+            \tl_use:N \g_question_memoire_tl
+        \group_end:
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\tl_new:N \g_inseparable_tl
+\tl_gset:Nn \g_inseparable_tl { }
+
+\NewDocumentCommand{\inseparable}{ o }
+    {
+        \str_case:nnF { #1 }
+            {
+                {sujet}
+                    {
+                        \bool_if:NF \g_correction_bool
+                            {
+                                \begin{minipage}{\linewidth}
+                                \tl_gset:Nn \g_inseparable_tl { \end{minipage}\tl_gset:Nn \g_inseparable_tl { } }
+                            }
+                    }
+                {correction}
+                    {
+                        \bool_if:NT \g_correction_bool
+                            {
+                                \begin{minipage}{\linewidth}
+                                \tl_gset:Nn \g_inseparable_tl { \end{minipage}\tl_gset:Nn \g_inseparable_tl { } }
+                            }
+                    }
+                {toujours}
+                    {
+                        \begin{minipage}{\linewidth}
+                        \tl_gset:Nn \g_inseparable_tl { \end{minipage}\tl_gset:Nn \g_inseparable_tl { } }
+                    }
+            }
+            {
+                \begin{minipage}{\linewidth}
+                \tl_gset:Nn \g_inseparable_tl { \end{minipage}\tl_gset:Nn \g_inseparable_tl { } }
+            }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\NewDocumentCommand{\itemvrai}{ m +m }
+    {
+        \setlength{\fboxsep}{0pt}
+        \fbox
+            {
+                \parbox{\dimexpr \linewidth - 2\fboxrule - 2\fboxsep \relax}
+                    {
+                        \centering
+                        \parbox{\dimexpr \linewidth - 10pt \relax}
+                            {
+                                \mathversion{bold}
+                                    \begin{enumerate}[label=\Alph*., start=#1, left=0pt, itemsep=0pt, topsep=2pt]
+                                        \bfseries #2
+                                    \end{enumerate}
+                                \mathversion{normal}
+                            }
+                    }
+            }
+    }
+
+
+\NewDocumentCommand{\itemfaux}{ m +m }
+    {
+        \par
+        \parbox{\linewidth}
+            {
+                \centering
+                \parbox{\dimexpr \linewidth - 10pt + 2\fboxrule \relax}
+                    {
+                        \begin{enumerate}[label=\Alph*., start=#1, left=0pt, itemsep=0pt, topsep=2pt]
+                            #2
+                        \end{enumerate}
+                    }
+            }
+        \par
+    }
+    
+
+
+
+
+
+
+
+
+
+\prop_new:N \g_bilan_prop
+\tl_new:N \l_bilan_de_reponse_tl
+
+
+\prop_put:Nnn \g_bilan_prop { A }
+    {
+        \tl_gset:Nn \g_bilan_de_reponse_tl { {\bfseries Réponse~vraie~:~A} }
+        \seq_gput_right:Nn \g_bilans_seq {{black}{white}{white}{white}{white}}
+        \itemvrai{1}
+            {
+                \item \l_itema_tl
+            }
+        \itemfaux{2}
+            {
+                \item \l_itemb_tl
+                \item \l_itemc_tl
+                \item \l_itemd_tl
+                \item \l_iteme_tl
+            }
+    }
+\prop_put:Nnn \g_bilan_prop { B }
+    {
+        \tl_gset:Nn \g_bilan_de_reponse_tl { {\bfseries Réponse~vraie~:~B} }
+        \seq_gput_right:Nn \g_bilans_seq {{white}{black}{white}{white}{white}}
+        \itemfaux{1}
+            {
+                \item \l_itema_tl
+            }
+        \itemvrai{2}
+            {
+                \item \l_itemb_tl
+            }
+        \itemfaux{3}
+            {
+                \item \l_itemc_tl
+                \item \l_itemd_tl
+                \item \l_iteme_tl
+            }
+    }
+\prop_put:Nnn \g_bilan_prop { C }
+    {
+        \tl_gset:Nn \g_bilan_de_reponse_tl { {\bfseries Réponse~vraie~:~C} }
+        \seq_gput_right:Nn \g_bilans_seq {{white}{white}{black}{white}{white}}
+        \itemfaux{1}
+            {
+                \item \l_itema_tl
+                \item \l_itemb_tl
+            }
+        \itemvrai{3}
+            {
+                \item \l_itemc_tl
+            }
+        \itemfaux{4}
+            {
+                \item \l_itemd_tl
+                \item \l_iteme_tl
+            }
+    }
+\prop_put:Nnn \g_bilan_prop { D }
+    {
+        \tl_gset:Nn \g_bilan_de_reponse_tl { {\bfseries Réponse~vraie~:~D} }
+        \seq_gput_right:Nn \g_bilans_seq {{white}{white}{white}{black}{white}}
+        \itemfaux{1}
+            {
+                \item \l_itema_tl
+                \item \l_itemb_tl
+                \item \l_itemc_tl
+            }
+        \itemvrai{4}
+            {
+                \item \l_itemd_tl
+            }
+        \itemfaux{5}
+            {
+                \item \l_iteme_tl
+            }
+    }
+\prop_put:Nnn \g_bilan_prop { E }
+    {
+        \tl_gset:Nn \g_bilan_de_reponse_tl { {\bfseries Réponse~vraie~:~E} }
+        \seq_gput_right:Nn \g_bilans_seq {{white}{white}{white}{white}{black}}
+        \itemfaux{1}
+            {
+                \item \l_itema_tl
+                \item \l_itemb_tl
+                \item \l_itemc_tl
+                \item \l_itemd_tl
+            }
+        \itemvrai{5}
+            {
+                \item \l_iteme_tl
+            }
+    }
+
+\prop_put:Nnn \g_bilan_prop { AB }
+    {
+        \tl_gset:Nn \g_bilan_de_reponse_tl { {\bfseries Réponses~vraies~:~A~et~B} }
+        \seq_gput_right:Nn \g_bilans_seq {{black}{black}{white}{white}{white}}
+        \itemvrai{1}
+            {
+                \item \l_itema_tl
+                \item \l_itemb_tl
+            }
+        \itemfaux{3}
+            {
+                \item \l_itemc_tl
+                \item \l_itemd_tl
+                \item \l_iteme_tl
+            }
+    }
+\prop_put:Nnn \g_bilan_prop { AC }
+    {
+        \tl_gset:Nn \g_bilan_de_reponse_tl { {\bfseries Réponses~vraies~:~A~et~C} }
+        \seq_gput_right:Nn \g_bilans_seq {{black}{white}{black}{white}{white}}
+        \itemvrai{1}
+            {
+                \item \l_itema_tl
+            }
+        \itemfaux{2}
+            {
+                \item \l_itemb_tl
+            }
+        \itemvrai{3}
+            {
+                \item \l_itemc_tl
+            }
+        \itemfaux{4}
+            {
+                \item \l_itemd_tl
+                \item \l_iteme_tl
+            }
+    }
+\prop_put:Nnn \g_bilan_prop { AD }
+    {
+        \tl_gset:Nn \g_bilan_de_reponse_tl { {\bfseries Réponses~vraies~:~A~et~D} }
+        \seq_gput_right:Nn \g_bilans_seq {{black}{white}{white}{black}{white}}
+        \itemvrai{1}
+            {
+                \item \l_itema_tl
+            }
+        \itemfaux{2}
+            {
+                \item \l_itemb_tl
+                \item \l_itemc_tl
+            }
+        \itemvrai{4}
+            {
+                \item \l_itemd_tl
+            }
+        \itemfaux{5}
+            {
+                \item \l_iteme_tl
+            }
+    }
+\prop_put:Nnn \g_bilan_prop { AE }
+    {
+        \tl_gset:Nn \g_bilan_de_reponse_tl { {\bfseries Réponses~vraies~:~A~et~E} }
+        \seq_gput_right:Nn \g_bilans_seq {{black}{white}{white}{white}{black}}
+        \itemvrai{1}
+            {
+                \item \l_itema_tl
+            }
+        \itemfaux{2}
+            {
+                \item \l_itemb_tl
+                \item \l_itemc_tl
+                \item \l_itemd_tl
+            }
+        \itemvrai{5}
+            {
+                \item \l_iteme_tl
+            }
+    }
+\prop_put:Nnn \g_bilan_prop { BC }
+    {
+        \tl_gset:Nn \g_bilan_de_reponse_tl { {\bfseries Réponses~vraies~:~B~et~C} }
+        \seq_gput_right:Nn \g_bilans_seq {{white}{black}{black}{white}{white}}
+        \itemfaux{1}
+            {
+                \item \l_itema_tl
+            }
+        \itemvrai{2}
+            {
+                \item \l_itemb_tl
+                \item \l_itemc_tl
+            }
+        \itemfaux{4}
+            {
+                \item \l_itemd_tl
+                \item \l_iteme_tl
+            }
+    }
+\prop_put:Nnn \g_bilan_prop { BD }
+    {
+        \tl_gset:Nn \g_bilan_de_reponse_tl { {\bfseries Réponses~vraies~:~B~et~D} }
+        \seq_gput_right:Nn \g_bilans_seq {{white}{black}{white}{black}{white}}
+        \itemfaux{1}
+            {
+                \item \l_itema_tl
+            }
+        \itemvrai{2}
+            {
+                \item \l_itemb_tl
+            }
+        \itemfaux{3}
+            {
+                \item \l_itemc_tl
+            }
+        \itemvrai{4}
+            {
+                \item \l_itemd_tl
+            }
+        \itemfaux{5}
+            {
+                \item \l_iteme_tl
+            }
+    }
+\prop_put:Nnn \g_bilan_prop { BE }
+    {
+        \tl_gset:Nn \g_bilan_de_reponse_tl { {\bfseries Réponses~vraies~:~B~et~E} }
+        \seq_gput_right:Nn \g_bilans_seq {{white}{black}{white}{white}{black}}
+        \itemfaux{1}
+            {
+                \item \l_itema_tl
+            }
+        \itemvrai{2}
+            {
+                \item \l_itemb_tl
+            }
+        \itemfaux{3}
+            {
+                \item \l_itemc_tl
+                \item \l_itemd_tl
+            }
+        \itemvrai{5}
+            {
+                \item \l_iteme_tl
+            }
+    }
+\prop_put:Nnn \g_bilan_prop { CD }
+    {
+        \tl_gset:Nn \g_bilan_de_reponse_tl { {\bfseries Réponses~vraies~:~C~et~D} }
+        \seq_gput_right:Nn \g_bilans_seq {{white}{white}{black}{black}{white}}
+        \itemfaux{1}
+            {
+                \item \l_itema_tl
+                \item \l_itemb_tl
+            }
+        \itemvrai{3}
+            {
+                \item \l_itemc_tl
+                \item \l_itemd_tl
+            }
+        \itemfaux{5}
+            {
+                \item \l_iteme_tl
+            }
+    }
+\prop_put:Nnn \g_bilan_prop { CE }
+    {
+        \tl_gset:Nn \g_bilan_de_reponse_tl { {\bfseries Réponses~vraies~:~C~et~E} }
+        \seq_gput_right:Nn \g_bilans_seq {{white}{white}{black}{white}{black}}
+        \itemfaux{1}
+            {
+                \item \l_itema_tl
+                \item \l_itemb_tl
+            }
+        \itemvrai{3}
+            {
+                \item \l_itemc_tl
+            }
+        \itemfaux{4}
+            {
+                \item \l_itemd_tl
+            }
+        \itemvrai{5}
+            {
+                \item \l_iteme_tl
+            }
+    }
+\prop_put:Nnn \g_bilan_prop { DE }
+    {
+        \tl_gset:Nn \g_bilan_de_reponse_tl { {\bfseries Réponses~vraies~:~D~et~E} }
+        \seq_gput_right:Nn \g_bilans_seq {{white}{white}{white}{black}{black}}
+        \itemfaux{1}
+            {
+                \item \l_itema_tl
+                \item \l_itemb_tl
+                \item \l_itemc_tl
+            }
+        \itemvrai{4}
+            {
+                \item \l_itemd_tl
+                \item \l_iteme_tl
+            }
+    }
+
+\prop_put:Nnn \g_bilan_prop { ABC }
+    {
+        \tl_gset:Nn \g_bilan_de_reponse_tl { {\bfseries Réponses~vraies~:~A,~B~et~C} }
+        \seq_gput_right:Nn \g_bilans_seq {{black}{black}{black}{white}{white}}
+        \itemvrai{1}
+            {
+                \item \l_itema_tl
+                \item \l_itemb_tl
+                \item \l_itemc_tl
+            }
+        \itemfaux{4}
+            {
+                \item \l_itemd_tl
+                \item \l_iteme_tl
+            }
+    }
+\prop_put:Nnn \g_bilan_prop { ABD }
+    {
+        \tl_gset:Nn \g_bilan_de_reponse_tl { {\bfseries Réponses~vraies~:~A,~B~et~D} }
+        \seq_gput_right:Nn \g_bilans_seq {{black}{black}{white}{black}{white}}
+        \itemvrai{1}
+            {
+                \item \l_itema_tl
+                \item \l_itemb_tl
+            }
+        \itemfaux{3}
+            {
+                \item \l_itemc_tl
+            }
+        \itemvrai{4}
+            {
+                \item \l_itemd_tl
+            }
+        \itemfaux{5}
+            {
+                \item \l_iteme_tl
+            }
+    }
+\prop_put:Nnn \g_bilan_prop { ABE }
+    {
+        \tl_gset:Nn \g_bilan_de_reponse_tl { {\bfseries Réponses~vraies~:~A,~B~et~E} }
+        \seq_gput_right:Nn \g_bilans_seq {{black}{black}{white}{white}{black}}
+        \itemvrai{1}
+            {
+                \item \l_itema_tl
+                \item \l_itemb_tl
+            }
+        \itemfaux{3}
+            {
+                \item \l_itemc_tl
+                \item \l_itemd_tl
+            }
+        \itemvrai{5}
+            {
+                \item \l_iteme_tl
+            }
+    }
+\prop_put:Nnn \g_bilan_prop { ACD }
+    {
+        \tl_gset:Nn \g_bilan_de_reponse_tl { {\bfseries Réponses~vraies~:~A,~C~et~D} }
+        \seq_gput_right:Nn \g_bilans_seq {{black}{white}{black}{black}{white}}
+        \itemvrai{1}
+            {
+                \item \l_itema_tl
+            }
+        \itemfaux{2}
+            {
+                \item \l_itemb_tl
+            }
+        \itemvrai{3}
+            {
+                \item \l_itemc_tl
+                \item \l_itemd_tl
+            }
+        \itemfaux{5}
+            {
+                \item \l_iteme_tl
+            }
+    }
+\prop_put:Nnn \g_bilan_prop { ACE }
+    {
+        \tl_gset:Nn \g_bilan_de_reponse_tl { {\bfseries Réponses~vraies~:~A,~C~et~E} }
+        \seq_gput_right:Nn \g_bilans_seq {{black}{white}{black}{white}{black}}
+        \itemvrai{1}
+            {
+                \item \l_itema_tl
+            }
+        \itemfaux{2}
+            {
+                \item \l_itemb_tl
+            }
+        \itemvrai{3}
+            {
+                \item \l_itemc_tl
+            }
+        \itemfaux{4}
+            {
+                \item \l_itemd_tl
+            }
+        \itemvrai{5}
+            {
+                \item \l_iteme_tl
+            }
+    }
+\prop_put:Nnn \g_bilan_prop { ADE }
+    {
+        \tl_gset:Nn \g_bilan_de_reponse_tl { {\bfseries Réponses~vraies~:~A,~D~et~E} }
+        \seq_gput_right:Nn \g_bilans_seq {{black}{white}{white}{black}{black}}
+        \itemvrai{1}
+            {
+                \item \l_itema_tl
+            }
+        \itemfaux{2}
+            {
+                \item \l_itemb_tl
+                \item \l_itemc_tl
+            }
+        \itemvrai{4}
+            {
+                \item \l_itemd_tl
+                \item \l_iteme_tl
+            }
+    }
+\prop_put:Nnn \g_bilan_prop { BCD }
+    {
+        \tl_gset:Nn \g_bilan_de_reponse_tl { {\bfseries Réponses~vraies~:~B,~C~et~D} }
+        \seq_gput_right:Nn \g_bilans_seq {{white}{black}{black}{black}{white}}
+        \itemfaux{1}
+            {
+                \item \l_itema_tl
+            }
+        \itemvrai{2}
+            {
+                \item \l_itemb_tl
+                \item \l_itemc_tl
+                \item \l_itemd_tl
+            }
+        \itemfaux{5}
+            {
+                \item \l_iteme_tl
+            }
+    }
+\prop_put:Nnn \g_bilan_prop { BCE }
+    {
+        \tl_gset:Nn \g_bilan_de_reponse_tl { {\bfseries Réponses~vraies~:~B,~C~et~E} }
+        \seq_gput_right:Nn \g_bilans_seq {{white}{black}{black}{white}{black}}
+        \itemfaux{1}
+            {
+                \item \l_itema_tl
+            }
+        \itemvrai{2}
+            {
+                \item \l_itemb_tl
+                \item \l_itemc_tl
+            }
+        \itemfaux{4}
+            {
+                \item \l_itemd_tl
+            }
+        \itemvrai{5}
+            {
+                \item \l_iteme_tl
+            }
+    }
+\prop_put:Nnn \g_bilan_prop { BDE }
+    {
+        \tl_gset:Nn \g_bilan_de_reponse_tl { {\bfseries Réponses~vraies~:~B,~D~et~E} }
+        \seq_gput_right:Nn \g_bilans_seq {{white}{black}{white}{black}{black}}
+        \itemfaux{1}
+            {
+                \item \l_itema_tl
+            }
+        \itemvrai{2}
+            {
+                \item \l_itemb_tl
+            }
+        \itemfaux{3}
+            {
+                \item \l_itemc_tl
+            }
+        \itemvrai{4}
+            {
+                \item \l_itemd_tl
+                \item \l_iteme_tl
+            }
+    }
+\prop_put:Nnn \g_bilan_prop { CDE }
+    {
+        \tl_gset:Nn \g_bilan_de_reponse_tl { {\bfseries Réponses~vraies~:~C,~D~et~E} }
+        \seq_gput_right:Nn \g_bilans_seq {{white}{white}{black}{black}{black}}
+        \itemfaux{1}
+            {
+                \item \l_itema_tl
+                \item \l_itemb_tl
+            }
+        \itemvrai{3}
+            {
+                \item \l_itemc_tl
+                \item \l_itemd_tl
+                \item \l_iteme_tl
+            }
+    }
+
+\prop_put:Nnn \g_bilan_prop { ABCD }
+    {
+        \tl_gset:Nn \g_bilan_de_reponse_tl { {\bfseries Réponses~vraies~:~A,~B,~C~et~D} }
+        \seq_gput_right:Nn \g_bilans_seq {{black}{black}{black}{black}{white}}
+        \itemvrai{1}
+            {
+                \item \l_itema_tl
+                \item \l_itemb_tl
+                \item \l_itemc_tl
+                \item \l_itemd_tl
+            }
+        \itemfaux{5}
+            {
+                \item \l_iteme_tl
+            }
+    }
+\prop_put:Nnn \g_bilan_prop { ABCE }
+    {
+        \tl_gset:Nn \g_bilan_de_reponse_tl { {\bfseries Réponses~vraies~:~A,~B,~C~et~E} }
+        \seq_gput_right:Nn \g_bilans_seq {{black}{black}{black}{white}{black}}
+        \itemvrai{1}
+            {
+                \item \l_itema_tl
+                \item \l_itemb_tl
+                \item \l_itemc_tl
+            }
+        \itemfaux{4}
+            {
+                \item \l_itemd_tl
+            }
+        \itemvrai{5}
+            {
+                \item \l_iteme_tl
+            }
+    }
+\prop_put:Nnn \g_bilan_prop { ABDE }
+    {
+        \tl_gset:Nn \g_bilan_de_reponse_tl { {\bfseries Réponses~vraies~:~A,~B,~D~et~E} }
+        \seq_gput_right:Nn \g_bilans_seq {{black}{black}{white}{black}{black}}
+        \itemvrai{1}
+            {
+                \item \l_itema_tl
+                \item \l_itemb_tl
+            }
+        \itemfaux{3}
+            {
+                \item \l_itemc_tl
+            }
+        \itemvrai{4}
+            {
+                \item \l_itemd_tl
+                \item \l_iteme_tl
+            }
+    }
+\prop_put:Nnn \g_bilan_prop { ACDE }
+    {
+        \tl_gset:Nn \g_bilan_de_reponse_tl { {\bfseries Réponses~vraies~:~A,~C,~D~et~E} }
+        \seq_gput_right:Nn \g_bilans_seq {{black}{white}{black}{black}{black}}
+        \itemvrai{1}
+            {
+                \item \l_itema_tl
+            }
+        \itemfaux{2}
+            {
+                \item \l_itemb_tl
+            }
+        \itemvrai{3}
+            {
+                \item \l_itemc_tl
+                \item \l_itemd_tl
+                \item \l_iteme_tl
+            }
+    }
+\prop_put:Nnn \g_bilan_prop { BCDE }
+    {
+        \tl_gset:Nn \g_bilan_de_reponse_tl { {\bfseries Réponses~vraies~:~B,~C,~D~et~E} }
+        \seq_gput_right:Nn \g_bilans_seq {{white}{black}{black}{black}{black}}
+        \itemfaux{1}
+            {
+                \item \l_itema_tl
+            }
+        \itemvrai{2}
+            {
+                \item \l_itemb_tl
+                \item \l_itemc_tl
+                \item \l_itemd_tl
+                \item \l_iteme_tl
+            }
+    }
+
+\prop_put:Nnn \g_bilan_prop { ABCDE }
+    {
+        \tl_gset:Nn \g_bilan_de_reponse_tl { {\bfseries Réponses~vraies~:~A,~B,~C,~D~et~E} }
+        \seq_gput_right:Nn \g_bilans_seq {{black}{black}{black}{black}{black}}
+        \itemvrai{1}
+            {
+                \item \l_itema_tl
+                \item \l_itemb_tl
+                \item \l_itemc_tl
+                \item \l_itemd_tl
+                \item \l_iteme_tl
+            }
+    }
+
+\prop_put:Nnn \g_bilan_prop { }
+    {
+        \tl_gset:Nn \g_bilan_de_reponse_tl { }
+        \seq_gput_right:Nn \g_bilans_seq {{white}{white}{white}{white}{white}}
+        \itemfaux{1}
+            {
+                \item \l_itema_tl
+                \item \l_itemb_tl
+                \item \l_itemc_tl
+                \item \l_itemd_tl
+                \item \l_iteme_tl
+            }
+    }
+
+\prop_put:Nnn \g_bilan_prop { QO }
+    {
+        \tl_gset:Nn \g_bilan_de_reponse_tl { }
+        \seq_gput_right:Nn \g_bilans_seq {{white}{white}{white}{white}{white}}
+    }
+
+
+
+
+
+
+
+\tl_new:N \l_itema_tl
+\tl_new:N \l_itemb_tl
+\tl_new:N \l_itemc_tl
+\tl_new:N \l_itemd_tl
+\tl_new:N \l_iteme_tl
+\tl_new:N \l_itemf_tl
+\tl_new:N \l_itemg_tl
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\int_new:N \g_question_number_int
+\int_gset:Nn \g_question_number_int {1}
+\str_new:N \g_bilan_str
+\seq_new:N \g_bilans_seq
+
+\AtEndDocument
+    {
+        \iow_new:N \g_bilans_iow
+        \iow_open:Nn \g_bilans_iow { bilans.aux }
+        \seq_map_inline:Nn \g_bilans_seq
+          {
+            \iow_now:Nn \g_bilans_iow { #1 }
+          }
+        \iow_close:N \g_bilans_iow
+    }
+
+
+\newsavebox\MBox
+
+\NewDocumentCommand{\question}{ s m +m +m +m +m +m +m +m }
+{
+    \str_gset:Nn \g_bilan_str { #9 }
+
+    \bigskip
+    \bigskip
+
+    \begin{tikzpicture}
+        \node[inner~sep=0pt, align=justify, text~width=\linewidth] at (0,0) 
+            {
+                        \MEPquestion{#2}{#3}
+    
+                        \bool_if:NTF \g_correction_bool
+                            {
+                                \tl_gset:Nn \l_itema_tl { #4 }
+                                \tl_gset:Nn \l_itemb_tl { #5 }
+                                \tl_gset:Nn \l_itemc_tl { #6 }
+                                \tl_gset:Nn \l_itemd_tl { #7 }
+                                \tl_gset:Nn \l_iteme_tl { #8 }
+            
+                                \medskip
+            
+                                \leftskip=0em
+                                
+                                \int_while_do:nNnn { \g_question_number_int } < { \int_eval:n { #2 - 1 } }
+                                    {
+                                        \int_gincr:N \g_question_number_int
+                                        \seq_put_right:Nn \g_bilans_seq { {white}{white}{white}{white}{white} }
+                                    }
+                                \prop_item:Nn \g_bilan_prop { #9 }
+                            }
+                            {   
+                                \begin{enumerate}
+                                    [
+                                        label=\Alph*.,
+                                        leftmargin=\dimexpr \labelwidth + \g_indentation_item_dim \relax
+                                    ]  
+                                    \item {#4}
+                                    \item {#5}
+                                    \item {#6}
+                                    \item {#7}
+                                    \item {#8}
+                                \end{enumerate}
+                                
+                                \bigskip
+                                \bigskip
+                            }
+            };
+
+        \IfBooleanTF#1
+            {
+                \node[opacity=0.35, align=center, color=red, rotate=20, scale=2.5] at (0,0) 
+                    {
+                        \sc Question\\ \sc Hors~ Programme
+                    };
+            }
+            {}
+    \end{tikzpicture}
+
+    \int_gset:Nn \g_question_number_int {#2}
+    \g_inseparable_tl
+}
+
+
+
+
+
+
+
+
+
+
+\bool_new:N \g_QO_bool
+\bool_gset_false:N \g_QO_bool
+
+\NewDocumentCommand{\questionouverte}{ m +m +o +o +o +o +o +o +o }
+    {
+        \bool_gset_true:N \g_QO_bool
+        \str_gset:Nn \g_bilan_str { QO }
+
+        \bigskip
+        \bigskip
+        
+        \vbox
+            {
+                \MEPquestion{#1}{#2}
+        
+                \IfNoValueTF {#3}
+                    {}
+                    {
+                        \begin{enumerate}
+                            [
+                                label=\Alph*.,
+                                leftmargin=\dimexpr \labelwidth + \g_indentation_item_dim \relax
+                            ]  
+                            \IfNoValueTF {#3} {} {\item {#3}\tl_gset:Nn \l_itema_tl { #3 }}
+                            \IfNoValueTF {#4} {} {\item {#4}\tl_gset:Nn \l_itemb_tl { #4 }}
+                            \IfNoValueTF {#5} {} {\item {#5}\tl_gset:Nn \l_itemc_tl { #5 }}
+                            \IfNoValueTF {#6} {} {\item {#6}\tl_gset:Nn \l_itemd_tl { #6 }}
+                            \IfNoValueTF {#7} {} {\item {#7}\tl_gset:Nn \l_iteme_tl { #7 }}
+                            \IfNoValueTF {#8} {} {\item {#8}\tl_gset:Nn \l_itemf_tl { #8 }}
+                            \IfNoValueTF {#9} {} {\item {#9}\tl_gset:Nn \l_itemg_tl { #9 }}
+                        \end{enumerate}
+
+                        \leftskip=0em
+
+                        \int_while_do:nNnn { \g_question_number_int } < { \int_eval:n { #1 - 1 } }
+                            {
+                                \int_gincr:N \g_question_number_int
+                                \seq_put_right:Nn \g_bilans_seq { {white}{white}{white}{white}{white} }
+                            }
+                        \prop_item:Nn \g_bilan_prop { QO }
+                    }
+            }
+        
+        \int_gset:Nn \g_question_number_int {#1}
+        \g_inseparable_tl
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\NewDocumentCommand{\grille}{ o }
+    {
+        \str_if_eq:nnTF { #1 }{ vierge }
+            { \grilleWithoutCondition[vierge] }
+            { \bool_if:NT \g_correction_bool { \grilleWithoutCondition } }
+    }
+
+
+\NewDocumentCommand{\grilleWithoutCondition}{ o }
+    {
+        \group_begin:
+            \thispagestyle{empty}
+
+            \str_if_eq:nnTF { #1 }{ vierge }
+                {}
+                {
+                    \seq_new:N \g_bilans_r_seq
+                    \file_if_exist:nT {bilans.aux}
+                        {
+                            \ior_new:N \g_bilans_ior
+                            \ior_open:Nn \g_bilans_ior { bilans.aux }
+                            \ior_map_inline:Nn \g_bilans_ior
+                                {
+                                    \seq_put_right:Nn \g_bilans_r_seq { ##1 }
+                                }
+                            \ior_close:N \g_bilans_ior
+                        }
+                }
+            
+            \begin{minipage}[b]{.2\linewidth}
+                \includegraphics[width=\linewidth]{logo.png}
+            \end{minipage}
+
+            \hfill
+            
+            \begin{minipage}[b]{0.31\linewidth}
+                \fontsize{19pt}{21pt}\selectfont
+                \sf
+                Université~Paris~Cité\\
+                A2SUP~-~Tutorat
+            \end{minipage}
+            
+            \hfill
+            
+            \begin{minipage}[b]{0.43\linewidth}
+                \sf
+                \fontsize{8pt}{10pt}\selectfont
+                Tuto~n$^\circ$~:~\NumeroDuSupport\hfill UE~(spé)~:~\UEnameShort\hfill\mbox{}\par
+                \vspace{\dimexpr-\baselineskip+0.5em\relax}
+                {\color{red}\rule{\linewidth}{1pt}}\par
+                \medskip
+                \fontsize{10pt}{12pt}\selectfont
+                Nom~:\par
+                Prénom~:\par
+                Numéro~A2SUP~:
+            \end{minipage}
+            
+            \begin{tcolorbox}[colframe=red, colback=white, boxrule=1pt, arc=0pt, left=0pt, right=0pt, top=0pt, bottom=0pt, boxsep=0pt]
+                \fontsize{8pt}{8pt}\selectfont
+                \vspace*{\dimexpr0.5\baselineskip\relax}
+                \rule{\linewidth}{3pt}\par
+                \centering
+                {
+                    \vspace{\dimexpr-\lineskip-0.95\baselineskip\relax}
+                    \bfseries
+                    \fontsize{8pt}{10pt}\selectfont
+                    \sf
+                    \setlength{\fboxsep}{0pt}
+                    \fcolorbox{white}{white}{\hspace*{1em}IDENTIFICATION\hspace*{1em}}
+                    \par
+                }
+                
+                \begin{minipage}{0.45\linewidth}
+                    \sf
+                    \fontsize{8pt}{10pt}\selectfont
+                    \centering
+                    \group_begin:
+                        \begin{tikzpicture}[line~width=1pt, rounded~corners=0.25pt]
+                            \foreach \c [count=\row from 0] in {{Unit.},{Diz.},{Cent.},{Mil.},{Diz.~Mil.}} {
+                                \node[anchor=east] at (-0, \row * 0.4 + 0.3 * 0.5) {\c};
+                                
+                                \foreach \col in {0, 1, 2, 3, 4, 5, 6, 7, 8, 9} {
+                                    \pgfmathsetmacro{\xstart}{\col * (0.25 + 0.15)}
+                                    \pgfmathsetmacro{\ystart}{\row * (0.3 + 0.1)}
+                                    \draw (\xstart, \ystart) rectangle ++(0.25, 0.3);
+                                }
+                            }
+                            \foreach \col in {0, 1, 2, 3, 4, 5, 6, 7, 8, 9} 
+                                \node[anchor=south] at (\col * 0.40 + 0.25 * 0.5, 1.9) {\color{red}\col};
+                            
+                            \draw [->,>=latex,line~width=1.5pt] (-1.5, 1.9) --++ (0, -1.9)
+                                node[midway,left=3pt,align=center] {Numéro\\ A2SUP};
+                        \end{tikzpicture}
+                    \group_end:
+                \end{minipage}
+
+                \hfill
+                
+                \begin{minipage}{0.45\linewidth}
+                    \sf
+                    \fontsize{8pt}{10pt}\selectfont
+                    \group_begin:
+                        \begin{tikzpicture}[line~width=1pt, rounded~corners=0.25pt]
+                            \foreach \c [count=\row from 0] in {{J~Diz.},{J~Unit.},{M~Diz.},{M~Unit.}} {
+                                \node[anchor=east] at (-0, \row * 0.4 + 0.3 * 0.5) {\c};
+                                
+                                \foreach \col in {0, 1, 2, 3, 4, 5, 6, 7, 8, 9} {
+                                    \pgfmathsetmacro{\xstart}{\col * (0.25 + 0.15)}
+                                    \pgfmathsetmacro{\ystart}{\row * (0.3 + 0.1)}
+                                    \draw (\xstart, \ystart) rectangle ++(0.25, 0.3);
+                                }
+                            }
+                            \foreach \col in {0, 1, 2, 3, 4, 5, 6, 7, 8, 9} 
+                                \node[anchor=south] at (\col * 0.40 + 0.25 * 0.5, 1.5) {\color{red}\col};
+                            
+                            \node[anchor=east] at (-1.5, 0.75) {Contrôle};
+                            \node[anchor=north] at (1.925, 0) {Date~de~naissance~(JJ/MM)};
+                        \end{tikzpicture}
+                    \group_end:
+                \end{minipage}
+                \smallskip
+            \end{tcolorbox}
+            \vspace{5pt}
+            \nopagebreak[4]
+            \pgfmathsetmacro{\xspacing}{(\linewidth * 2.54/72.27 - 4*(3.5 + 0.25 * 2.54/72.27))/3}
+            \newdimen\myspacing
+            \myspacing=\dimexpr \textheight-\pagetotal\relax
+            \pgfmathsetmacro{\yspacing}{0.97 * (\myspacing * 2.54/72.27 - 12*1.4)/11}
+            \tikzset{every~picture/.append~style={fill=white}}
+            \begin{tikzpicture}[line~width=1pt]
+                \foreach \num [count=\i from 0] in {1,...,45} {
+                    \tl_set:Nx \l_tmpa_tl {\seq_item:Nn \g_bilans_r_seq {\i+1}}
+                    
+                    \pgfmathtruncatemacro{\row}{mod(\i, 12)} 
+                    \pgfmathtruncatemacro{\col}{floor(\i / 12)}
+                    \pgfmathsetmacro{\xstart}{\col * (3.5 + \xspacing)}
+                    \pgfmathsetmacro{\ystart}{-\row * (1.4 + \yspacing)}
+                    
+                    \draw (\xstart, \ystart) rectangle ++(3.5, 1.4);
+                    
+                    \node[anchor=north~west] at (\xstart, \ystart + 1.4) {\fontsize{12pt}{12pt}\selectfont\sf\bfseries\num};
+                    
+                    \pgfmathsetmacro{\itemystart}{\ystart + 1.4 - 0.15}
+                    \foreach \c [count=\item from 0] in {{A},{B},{C},{D},{E}} {
+                        \pgfmathsetmacro{\itemxstart}{\xstart + 3.5 - 0.15 - 1.25 - 0.28 * 4 + 0.53 * \item}
+                        
+                        \draw[rounded~corners=0.25pt, fill=\tl_item:Nn \l_tmpa_tl {\int_eval:n {\item + 1}}] (\itemxstart, \itemystart) rectangle ++(0.25, -0.3);
+                        
+                        \draw[rounded~corners=0.25pt] (\itemxstart, \ystart + 0.15 + 0.3) rectangle ++(0.25, -0.3);
+                        
+                        \node at (\itemxstart + 0.125, \ystart + 0.7) {\fontsize{10pt}{10pt}\selectfont\sf\bfseries\c};
+                    }
+                }
+            \end{tikzpicture}
+            
+        \group_end:
+        
+        \newpage
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\tcbset{
+  correctionstyle/.style={
+    enhanced,
+    breakable,
+    before~ skip=2mm,
+    after~ skip=2mm,
+    colback=\correction_color,
+    colframe=black,
+    title=Question~\int_use:N \g_question_number_int,
+    boxrule=0.5pt,
+    right=2pt,
+    left=2pt,
+    top=0pt,
+    bottom=0pt,
+    drop~ fuzzy~ shadow=black!50,
+    arc~ is~ angular,
+    attach~ boxed~ title~ to~ top~ right={
+        xshift=-1cm,
+        yshift*=3mm-\tcboxedtitleheight
+            },
+    varwidth~ boxed~ title*=-3cm,
+    boxed~ title~ style={
+        frame~ code={
+              \path[
+                draw=black,
+                fill=tcbcolback!40!black
+                    ]
+                ([yshift=-3mm,xshift=-0.4mm] frame.north~ west) [x~ radius=0.8mm, y~ radius=3mm] arc[start~ angle=0, end~ angle=180];
+              \path[
+                draw=black,
+                fill=tcbcolback!40!black
+                    ]
+                ([yshift=-3mm,xshift=0.4mm] frame.north~ east) [x~ radius=-0.8mm, y~ radius=3mm] arc[start~ angle=0, end~ angle=180];
+            \path[left~ color=blue!12, right~ color=blue!12,
+                middle~ color=blue!5, color=black]
+              ([xshift=-1mm]frame.north~ west) -- ([xshift=1mm]frame.north~ east)
+              [rounded~ corners=1mm]-- ([xshift=0.6mm, yshift=-1mm]frame.north~ east)
+              -- (frame.south~ east) -- (frame.south~ west)
+              -- ([xshift=-0.6mm, yshift=-1mm]frame.north~ west)
+              [sharp~ corners]-- cycle;
+            \draw[blue!30!black]
+              ([xshift=-1mm]frame.north~ west) -- ([xshift=1mm]frame.north~ east)
+              [rounded~ corners=1mm]-- ([xshift=0.6mm, yshift=-1mm]frame.north~ east)
+              -- (frame.south~ east) -- (frame.south~ west)
+              -- ([xshift=-0.6mm, yshift=-1mm]frame.north~ west)
+              [sharp~ corners]-- cycle;
+            },
+        interior~ engine=empty},
+    colbacktitle=blue!15!white,
+    coltitle=black,
+    fonttitle=\bfseries}}
+
+
+\tl_new:N \g_correctionitem_separation_tl
+
+\NewDocumentEnvironment{correction}{ o +b }
+    {
+        \bool_if:NTF \g_correction_bool
+            {
+                \bool_if:NTF \g_relectureprofs_bool
+                    {}
+                    {
+                        \tl_gset:Nn \g_correctionitem_separation_tl { \tl_gset:Nn \g_correctionitem_separation_tl { \bigskip } }
+                        
+                        \needspace{\baselineskip * 3}
+                        \begin{correctionWithoutCondition}[#1]
+                            #2
+                        \end{correctionWithoutCondition}
+                    }
+                \bool_gset_false:N \g_QO_bool
+            }
+            { }
+            
+    }
+    {
+        \par
+    }
+
+
+\keys_define:nn { A2SUP/correction }
+    {
+        couleur .tl_set:N = \l_correction_couleur_tl,
+        couleur .initial:n = { \correction_color }
+    }
+
+\NewDocumentEnvironment{correctionWithoutCondition}{ o +b }
+    {
+        \IfNoValueTF{#1}
+            {}{ \keys_set:nn { A2SUP/correction } {#1} }
+        \begin{tcolorbox}[correctionstyle]
+            #2\par
+            
+            \nopagebreak[4]
+            
+            \bigskip
+            
+            \nopagebreak[4]
+            \g_bilan_de_reponse_tl
+        \end{tcolorbox}
+        
+        \bigskip
+        % \bigskip
+    }{}
+
+
+
+\tl_new:N \l_item_tl
+
+\NewDocumentCommand{\correctionitem}{ s m }
+    {   
+        \g_correctionitem_separation_tl
+
+        \needspace{\baselineskip * 3}
+
+        \bool_if:NTF \g_QO_bool 
+            % si c'est une question ouverte
+            {
+                \str_set:Nn \l_tmpb_str { #2 }
+                \regex_replace_all:nnN { [^ABCDE] } { } \l_tmpb_str
+                \tl_set:Nn \l_item_tl {} % réinitialisation
+                \str_case:VnF \l_tmpb_str
+                    {
+                        { A } { \tl_set:Nn \l_item_tl \l_itema_tl }
+                        { B } { \tl_set:Nn \l_item_tl \l_itemb_tl }
+                        { C } { \tl_set:Nn \l_item_tl \l_itemc_tl }
+                        { D } { \tl_set:Nn \l_item_tl \l_itemd_tl }
+                        { E } { \tl_set:Nn \l_item_tl \l_iteme_tl }
+                        { F } { \tl_set:Nn \l_item_tl \l_itemf_tl }
+                        { G } { \tl_set:Nn \l_item_tl \l_itemg_tl }
+                    }
+                    {
+                        \msg_error:nn { A2SUP } { invalid-letter }
+                    }
+                {\Large \emoji{writing-hand}}
+                \; {\large\bfseries \uline{#2}}
+                \dim_zero:N \l_tmpa_dim
+                \settowidth{\l_tmpa_dim}{ {\Large \emoji{writing-hand}} \; {\large\bfseries \uline{#2}} }
+                {
+                    \IfBooleanTF#1
+                        {}
+                        {
+                            \color{gray}\sl\small \truncate{\dimexpr\linewidth - 2\fboxrule - 2\fboxsep - \l_tmpa_dim \relax}{\;\rightarrow\;\l_item_tl}
+                        }
+                }
+            }
+            % si c'est une question non-ouverte
+            {
+                \str_set:Nn \l_tmpb_str { #2 }
+                \regex_replace_all:nnN { [^ABCDE] } { } \l_tmpb_str
+                \tl_set:Nn \l_item_tl {} % réinitialisation
+                \int_compare:nNnTF { \tl_count:N \l_tmpb_str } > { 1 }
+                    {
+                        \begin{Huge}
+                            \mathversion{bold}
+                            \color{orange!95!black}
+                            \raisebox{-2pt}{\rotatebox{-15}{$?$}}
+                            \mathversion{normal}
+                        \end{Huge}
+                        \; {\large\bfseries \uline{#2}}
+                    }
+                    {
+                        \str_case:VnF \l_tmpb_str
+                            {
+                                { A } { \tl_set:Nn \l_item_tl \l_itema_tl }
+                                { B } { \tl_set:Nn \l_item_tl \l_itemb_tl }
+                                { C } { \tl_set:Nn \l_item_tl \l_itemc_tl }
+                                { D } { \tl_set:Nn \l_item_tl \l_itemd_tl }
+                                { E } { \tl_set:Nn \l_item_tl \l_iteme_tl }
+                            }
+                            {
+                                \msg_error:nn { A2SUP } { invalid-letter }
+                            }
+                        \str_map_inline:Nn { \l_tmpb_str }
+                            {
+                                \str_if_in:NnTF \g_bilan_str { ##1 }
+                                    {
+                                        {
+                                            \huge
+                                            \raisebox{-3pt}{\textcolor{green!60!black}{\ding{52}}}
+                                        }
+                                    }
+                                    {
+                                        {
+                                            \huge
+                                            \raisebox{-3pt}{\textcolor{red!90!black}{\ding{56}}}
+                                        }
+                                    }
+                            }
+                        \; {\large\bfseries \uline{#2}}
+                        \dim_zero:N \l_tmpa_dim
+                        \settowidth{\l_tmpa_dim}{ {\LARGE\raisebox{-3pt}{\textcolor{green!60!black}{\ding{52}}}} \; {\large\bfseries \uline{#2}} }
+                        {
+                            \IfBooleanTF#1
+                                {}
+                                {
+                                    \color{gray}\sl\small \truncate{\dimexpr\linewidth - 2\fboxrule - 2\fboxsep - \l_tmpa_dim \relax}{\;\rightarrow\;\l_item_tl}
+                                }
+                        }
+                    }            
+            }
+
+        \par
+
+        \medskip
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\NewDocumentCommand{\versoP}{}
+    {
+        \newpage
+        \thispagestyle{empty}
+
+        {
+            \centering
+            \bool_if:NTF \g_tierstemps_bool
+                { \setstretch{1} }
+                {}
+
+            \fontsize{15pt}{18pt}\selectfont
+            \str_case:VnTF \Support
+                {
+                    {tuto} {{\bfseries \uline{Cet~ examen~ blanc~ a~ été~ réalisé~ par}~ :}}
+                    {GT} {{\bfseries \uline{Ce~ GT~ a~ été~ réalisé~ par}~ :}}
+                    {fiche} {{\bfseries \uline{Cette~ fiche~ a~ été~ réalisée~ par}~ :}}
+                    {extra} {{\bfseries \uline{Cet~ extra~ a~ été~ réalisé~ par}~ :}}
+                    {poly~ de~ QCM} {{\bfseries \uline{Ce~ polycopié~ de~ QCM~ a~ été~ réalisé~ par}~ :}}
+                    {poly~ d'exos} {{\bfseries \uline{Ce~ polycopié~ d'exercices~ a~ été~ réalisé~ par}~ :}}
+                    {annale} {{\bfseries \uline{Cette~ annale~ a~ été~ réalisée~ par}~ :}}
+                }
+                {
+                    \typeout{Indicated support matches with one of existing support}
+                }
+                {
+                    \PackageError
+                        {A2SUP}
+                        {ERREUR~SUR~L'INDICATION~DU~SUPPORT}
+                        {Revois~le~support~que~tu~as~indiqué.
+                        \MessageBreak
+                        "tuto"~->~Examen Blanc \MessageBreak
+                        "GT"~->~Groupe de Travail \MessageBreak
+                        "poly d'exos"~->~Polycopié d'Exercices \MessageBreak
+                        "poly de QCM"~->~Polycopié de QCMs \MessageBreak
+                        "fiche"~->~Fiche \MessageBreak
+                        "extra"~->~Extra \MessageBreak
+                        "annale"~->~Annale \MessageBreak
+                        }
+                }
+
+            \vfill
+
+            \fontsize{14pt}{16pt}\selectfont
+            \par {\bfseries Rédacteurs~:}
+            \fontsize{12pt}{14pt}\selectfont
+            \par \Redacteurs
+
+            \vfill
+
+            \tl_if_empty:NF \Relecteurs
+                {
+                    \fontsize{14pt}{16pt}\selectfont
+                    \par {\bfseries Relecteurs~:}
+                    \fontsize{12pt}{14pt}\selectfont
+                    \par \Relecteurs
+
+                    \vfill
+                }
+
+            \tl_if_empty:NF \ConvertisseursLatex
+                {
+                    \fontsize{14pt}{16pt}\selectfont
+                    \par {\bfseries Convertisseurs~\LaTeX\ :}
+                    \fontsize{12pt}{14pt}\selectfont
+                    \par \ConvertisseursLatex
+
+                    \vfill
+                }
+
+            \tl_if_empty:NF \TuteursEnSeance
+                {
+                    \fontsize{14pt}{16pt}\selectfont
+                    \par {\bfseries Tuteurs~en~séance~:}
+                    \fontsize{12pt}{14pt}\selectfont
+                    \par \TuteursEnSeance
+
+                    \vfill
+                }
+
+            \tl_if_empty:NF \Testeurs
+                {
+                    \fontsize{14pt}{16pt}\selectfont
+                    \par Testeurs~:
+                    \fontsize{12pt}{14pt}\selectfont
+                    \par \Testeurs
+
+                    \vfill
+                }
+
+            \fontsize{12pt}{14pt}\selectfont
+            \par {\bfseries \color{\visu_color} Un~ grand~ merci~ aux~ VP~ Tuto~ \filiere\ :}
+            \par \VP
+
+            \vfill
+
+            \par Et~ enfin~ {\bfseries un~ immense~ merci~ aux~ tuteurs~ et~ tutrices~ de~ la~ team~ \color{\visu_color} \Team}
+
+            \vfill
+        
+            \tl_if_empty:NF \FacRedactionOuCollab
+                {
+                    \str_if_in:NnTF \FacRedactionOuCollab {daction}
+                        {
+                            \par {\color{\visu_color} Ce~ support~ a~ été~ rédigé~ par~ l{'}équipe~ pédagogique~ de~ l{'}université}
+                        }
+                        {
+                            \par {\color{\visu_color} Ce~ support~ est~ proposé~ en~ collaboration~ avec~ l{’}équipe~ pédagogique~ de~ l{’}université}
+                        }
+                        
+                }
+
+            \par Certains~ schémas~ de~ ce~ support~ sont~ issus~ des~ diapositives~ des~ enseignants~ d'Université~ Paris~ Cité
+
+            \vfill
+
+            \str_if_empty:NF \RemerciementsBonus
+                {
+                    \par \RemerciementsBonus
+
+                    \vfill
+                }
+
+            {\fontsize{12pt}{14pt}\selectfont\bfseries Sous~ la~ coordination~ de\ {\color{\visu_color} \RM}}
+
+            \vfill
+
+            \str_if_eq:VnT \Support { tuto }
+                {
+                    \vfill
+                    
+                    {\bfseries Prenez~ votre~ grille~ en~ photo~ avant~ de~ la~ rendre.}
+
+                    \par Vos~ note~ et~ classement~ sont~ disponibles~ sur~ le~ site~ {\bfseries a2sup.fr}.~ Si~ vous~ constatez~ une~ erreur,~ envoyez~ la~ photo~ de~ votre~ grille~ sur~ l'adresse~ {\bfseries grilles@a2sup.fr}
+        
+                    \vfill
+                }
+            
+            \par \href{https://discord.gg/mTFrNmk799}{
+                \includegraphics[width=2cm]{logo.png}
+                
+                \;\;
+    
+                \discord
+            }
+            
+            \smallskip
+
+            \par L'A2SUP~ répond~ à~ vos~ questions~ sur~ le~ \href{https://discord.gg/mTFrNmk799}{serveur~ discord}
+
+            
+
+            \par {\small \color{black!50} https://discord.gg/mTFrNmk799}
+            
+            \medskip
+
+            \par 
+            \begin{tcolorbox}[
+                colframe=\visu_color,%black,
+                colback=white,%blue!5!white,
+                arc=1mm,
+                top=0pt,
+                bottom=0pt,
+                boxrule=0.75pt
+                ]
+
+                \vspace{-1em}
+                
+                \centering
+                
+                \begin{tcolorbox}[
+                    colframe=\visu_color,%black,
+                    colback=white,%pink!20!white,
+                    arc=1mm,
+                    width=12em,
+                    top=0pt,
+                    bottom=0pt,
+                    boxrule=0.75pt
+                    ]
+                    \centering Les~ règles~ du~ serveur
+                \end{tcolorbox}
+
+                \vspace{-.6em}
+                
+                \begin{minipage}{.33\linewidth}
+                    \centering
+                    \fontsize{12pt}{14pt}\selectfont
+                    {\bfseries \uline{Question~ de~ cours}~ :}
+                    \fontsize{10pt}{12pt}\selectfont
+                    \par Titre~ du~ cours
+                    \par Photo/Diapo/Figure/Paragraphe
+                    \par Question
+                \end{minipage}
+
+                \begin{minipage}{.33\linewidth}
+                    \centering
+                    \fontsize{12pt}{14pt}\selectfont
+                    Utilise~ la~ loupe~ \emoji{mag}
+                    \par (en~ haut~ à~ droite)
+                \end{minipage}
+
+                \begin{minipage}{.33\linewidth}
+                    \centering
+                    \fontsize{12pt}{14pt}\selectfont
+                    {\bfseries \uline{Questions~ exos/annales}~ :}
+                    \fontsize{10pt}{12pt}\selectfont
+                    \par Qxx~ (ex~ :~ Q03~ et~ non~ Q3)
+                    \par \'Enoncé
+                    \par Questions
+                \end{minipage}
+            \end{tcolorbox}
+
+            \par {\bfseries L'A2SUP~ est~ connectée~ !~ Pour~ ne~ rater~ aucune~ info~ :}
+
+            \medskip
+
+            \par 
+            \href{https://www.facebook.com/A2SanteUP/?locale=fr_FR}{\facebook}
+            \hfill 
+            \href{https://www.instagram.com/a2sup/}{\instagram}
+            \hfill
+            \href{https://twitter.com/A2SUP}{\twitter}
+        }
+        
+        \bool_set_true:N \l_tmpa_bool
+    } %versoP
+    
+    
+\NewDocumentCommand{\versoL}{}
+    {
+        \newpage
+        \thispagestyle{empty}
+
+        {
+            \centering
+            \bool_if:NTF \g_tierstemps_bool
+                { \setstretch{1} }
+                {}
+
+            \fontsize{15pt}{18pt}\selectfont
+            \str_case:VnTF \Support
+                {
+                    {tuto} {{\bfseries \uline{Cet~ examen~ blanc~ a~ été~ réalisé~ par}~ :}}
+                    {GT} {{\bfseries \uline{Ce~ GT~ a~ été~ réalisé~ par}~ :}}
+                    {fiche} {{\bfseries \uline{Cette~ fiche~ a~ été~ réalisée~ par}~ :}}
+                    {extra} {{\bfseries \uline{Cet~ extra~ a~ été~ réalisé~ par}~ :}}
+                    {poly~ de~ QCM} {{\bfseries \uline{Ce~ polycopié~ de~ QCM~ a~ été~ réalisé~ par}~ :}}
+                    {poly~ d'exos} {{\bfseries \uline{Ce~ polycopié~ d'exercices~ a~ été~ réalisé~ par}~ :}}
+                    {pack} {{\bfseries \uline{Ce~ pack~ a~ été~ réalisé~ par}~ :}}
+                    {annale} {{\bfseries \uline{Cette~ annale~ a~ été~ réalisée~ par}~ :}}
+                }
+                {
+                    \typeout{Indicated support matches with one of existing support}
+                }
+                {
+                    \PackageError
+                        {A2SUP}
+                        {ERREUR~SUR~L'INDICATION~DU~SUPPORT}
+                        {Revois~le~support~que~tu~as~indiqué.
+                        \MessageBreak
+                        "tuto"~->~Examen Blanc \MessageBreak
+                        "GT"~->~Groupe de Travail \MessageBreak
+                        "poly d'exos"~->~Polycopié d'Exercices \MessageBreak
+                        "poly de QCM"~->~Polycopié de QCMs \MessageBreak
+                        "fiche"~->~Fiche \MessageBreak
+                        "extra"~->~Extra \MessageBreak
+                        "pack"~->~Pack~De~Fiches \MessageBreak
+                        "annale"~->~Annale \MessageBreak
+                        }
+                }
+
+            \vfill
+
+            \fontsize{14pt}{16pt}\selectfont
+            \par {\bfseries Rédacteurs~:}
+            \fontsize{12pt}{14pt}\selectfont
+            \par \Redacteurs
+
+            \vfill
+
+            \tl_if_empty:NF \Relecteurs
+                {
+                    \fontsize{14pt}{16pt}\selectfont
+                    \par {\bfseries Relecteurs~:}
+                    \fontsize{12pt}{14pt}\selectfont
+                    \par \Relecteurs
+
+                    \vfill
+                }
+
+            \tl_if_empty:NF \ConvertisseursLatex
+                {
+                    \fontsize{14pt}{16pt}\selectfont
+                    \par {\bfseries Convertisseurs~\LaTeX\ :}
+                    \fontsize{12pt}{14pt}\selectfont
+                    \par \ConvertisseursLatex
+
+                    \vfill
+                }
+
+            \tl_if_empty:NF \TuteursEnSeance
+                {
+                    \fontsize{14pt}{16pt}\selectfont
+                    \par {\bfseries Tuteurs~en~séance~:}
+                    \fontsize{12pt}{14pt}\selectfont
+                    \par \TuteursEnSeance
+
+                    \vfill
+                }
+
+            \tl_if_empty:NF \Testeurs
+                {
+                    \fontsize{14pt}{16pt}\selectfont
+                    \par Testeurs~:
+                    \fontsize{12pt}{14pt}\selectfont
+                    \par \Testeurs
+
+                    \vfill
+                }
+
+            \fontsize{12pt}{14pt}\selectfont
+            \par {\bfseries Un~ grand~ merci~ aux~ VP~ Tuto~ \filiere\ :}
+            \par \VP
+
+            \vfill
+
+            \par Et~ enfin~ {\bfseries un~ immense~ merci~ aux~ tuteurs~ et~ tutrices~ de~ la~ team~ \Team}
+
+            \vfill
+        
+            \tl_if_empty:NF \FacRedactionOuCollab
+                {
+                    \str_if_in:NnTF \FacRedactionOuCollab {daction}
+                        {
+                            \par {Ce~ support~ a~ été~ rédigé~ par~ l{'}équipe~ pédagogique~ de~ l{'}université}
+                        }
+                        {
+                            \par {Ce~ support~ est~ proposé~ en~ collaboration~ avec~ l{’}équipe~ pédagogique~ de~ l{’}université}
+                        }
+                        
+                }
+
+            \par Certains~ schémas~ de~ ce~ support~ sont~ issus~ des~ diapositives~ des~ enseignants~ d'Université~ Paris~ Cité
+
+            \vfill
+
+            \str_if_empty:NF \RemerciementsBonus
+                {
+                    \par \RemerciementsBonus
+
+                    \vfill
+                }
+
+            {\fontsize{12pt}{14pt}\selectfont\bfseries Sous~ la~ coordination~ de\ {\RM}}
+
+            \vfill
+
+            \str_if_eq:VnT \Support { tuto }
+                {
+                    % \vfill
+
+                    \begin{tcolorbox}[arc=0pt, colback=white,boxrule=0.5pt]
+                        \centering
+                        {\bfseries Prenez~ votre~ grille~ en~ photo~ avant~ de~ la~ rendre.}
+
+                        \par Vos~ note~ et~ classement~ sont~ disponibles~ sur~ le~ site~ {\bfseries \href{www.a2sup.fr}{a2sup.fr}}.~ Si~ vous~ constatez~ une~ erreur,~ envoyez~ la~ photo~ de~ votre~ grille~ sur~ l'adresse~ {\bfseries grilles@a2sup.fr}
+                    \end{tcolorbox}
+        
+                    \vfill
+                }
+            
+            \par \href{https://youtu.be/dQw4w9WgXcQ}{
+                \includegraphics[width=2cm]{logo.png}
+            
+                \quad
+
+                \discord
+            }
+
+            \smallskip
+
+            \par L'A2SUP~ répond~ à~ vos~ questions~ sur~ le~ forum~ :~ \href{https://forum.a2sup.fr}{forum.a2sup.fr}
+            
+            \medskip
+            % \vspace{1em}
+
+            \par 
+            \begin{tcolorbox}[
+                colframe=black,
+                colback=white,%blue!5!white,
+                arc=1mm,
+                top=0pt,
+                bottom=0pt,
+                boxrule=0.75pt
+                ]
+
+                \vspace{-1em}
+                
+                \centering
+                
+                \begin{tcolorbox}[
+                    colframe=black,
+                    colback=white,%pink!20!white,
+                    arc=1mm,
+                    width=12em,
+                    top=0pt,
+                    bottom=0pt,
+                    boxrule=0.75pt
+                    ]
+                    \centering Les~ règles~ du~ forum
+                \end{tcolorbox}
+
+                \vspace{-.6em}
+                
+                \begin{minipage}{.33\linewidth}
+                    \centering
+                    \fontsize{12pt}{14pt}\selectfont
+                    {\bfseries \uline{Question~ de~ cours}~ :}
+                    \fontsize{10pt}{12pt}\selectfont
+                    \par Titre~ du~ cours
+                    \par Photo/Diapo/Figure/Paragraphe
+                    \par Question
+                \end{minipage}
+
+                \begin{minipage}{.33\linewidth}
+                    \centering
+                    \fontsize{12pt}{14pt}\selectfont
+                    Utilise~ la~ loupe~ \emoji{mag}
+                    \par (en~ haut~ à~ droite)
+                \end{minipage}
+
+                \begin{minipage}{.33\linewidth}
+                    \centering
+                    \fontsize{12pt}{14pt}\selectfont
+                    {\bfseries \uline{Questions~ exos/annales}~ :}
+                    \fontsize{10pt}{12pt}\selectfont
+                    \par Qxx~ (ex~ :~ Q03~ et~ non~ Q3)
+                    \par \'Enoncé
+                    \par Questions
+                \end{minipage}
+            \end{tcolorbox}
+
+            \par {\bfseries L'A2SUP~ est~ connectée~ !~ Pour~ ne~ rater~ aucune~ info~ :}
+
+            \medskip
+
+            \par 
+            \href{https://www.facebook.com/A2SanteUP/?locale=fr_FR}{\facebook}
+            \hfill 
+            \href{https://www.instagram.com/a2sup/}{\instagram}
+            \hfill
+            \href{https://twitter.com/A2SUP}{\twitter}
+        }
+        
+        \bool_set_true:N \l_tmpa_bool
+    } % rectoL
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+
+\NewDocumentCommand{\facebook}{}
+    {
+        \begin{tikzpicture}
+            \node[left, scale=0.45] at (0,0)
+                {
+                    \draw_begin:
+                    \draw_path_corner_arc:nn { 5mm } { 5mm }
+                    \draw_path_rectangle_corners:nn { -1cm , -1cm } { 1cm , 1cm } 
+                    \color_fill:n { blue }
+                    \draw_path_use_clear:n { fill , stroke }
+                
+                    \draw_path_corner_arc:nn { 0mm } { 0mm }
+                    \draw_path_moveto:n { -0.15cm , -1cm } 
+                    \draw_path_lineto:n { -0.15cm , -0.3cm }
+                    \draw_path_lineto:n { -0.35cm , -0.3cm }
+                    \draw_path_lineto:n { -0.35cm , 0cm }
+                    \draw_path_lineto:n { -0.15cm , 0cm }
+                    \draw_path_lineto:n { -0.15cm , 0.3cm }
+                    \draw_path_curveto:nnn 
+                        { -0.15cm , 0.5cm }
+                        { -0.05cm , 0.6cm }
+                        { 0.15cm , 0.6cm } 
+                    \draw_path_lineto:n { 0.45cm , 0.6cm }
+                    \draw_path_lineto:n { 0.45cm , 0.3cm }
+                    \draw_path_lineto:n { 0.35cm , 0.3cm }
+                    \draw_path_curveto:nnn 
+                        { 0.15cm , 0.3cm }
+                        { 0.15cm , 0.3cm }
+                        { 0.15cm , 0.1cm } 
+                    \draw_path_lineto:n { 0.15cm , 0cm }
+                    \draw_path_lineto:n { 0.45cm , 0cm }
+                    \draw_path_lineto:n { 0.35cm , -0.3cm }
+                    \draw_path_lineto:n { 0.15cm , -0.3cm }
+                    \draw_path_lineto:n { 0.15cm , -1cm }
+                    \draw_path_lineto:n { -0.15cm , -1cm }
+                    \color_fill:n { white }
+                    \draw_path_use_clear:n { fill , stroke }
+                    \draw_end:
+                };
+            \node [right] at (0,0) {A2SUP};
+        \end{tikzpicture}
+    }
+
+
+\NewDocumentCommand{\instagram}{}
+    {
+        \begin{tikzpicture}
+            \node[left, scale=0.45] at (0,0) 
+                {
+                    \begin{tikzpicture}
+                        \shade [top~ color = blue!80!green!50!purple, bottom~ color = yellow, middle~ color = red!70!green!50!purple, shading~ angle=-10, rounded~ corners=10pt] (-1,-1) rectangle (1,1);
+                        \draw [line~width=3pt, color=white, rounded~corners=5pt] (-0.7,-0.7) rectangle (0.7,0.7);
+                        \draw [line~width=3pt, color=white] (0,0) circle (0.40cm);
+                        \draw [line~width=3pt, color=white] (0.43,0.43) circle (0.04cm);
+                    \end{tikzpicture}
+                };
+            \node [right] (0,0) {@A2SUP};
+        \end{tikzpicture}
+    }
+
+\NewDocumentCommand{\twitter}{}
+    {
+        \begin{tikzpicture}
+            \node[left, scale=0.45] at (0,0)
+                {
+                    \draw_begin:
+                        \draw_path_corner_arc:nn { 5mm } { 5mm }
+                        \draw_path_rectangle_corners:nn { -1cm , -1cm } { 1cm , 1cm } 
+                        \color_fill:n { black }
+                        \draw_path_use_clear:n { fill , stroke }
+                    
+                        \color_select:n { white }
+                        \draw_linewidth:n { 2pt }
+                        \draw_path_corner_arc:nn { 0pt } { 0pt }
+                        \draw_path_moveto:n { -0.7cm, -0.7cm }
+                        \draw_path_lineto:n { 0.7cm, 0.7cm }
+                        \draw_path_use_clear:n { stroke }
+                    
+                        \draw_path_moveto:n { 0.6cm , -0.6cm }
+                        \draw_path_lineto:n { -0.4cm , 0.6cm }
+                        \draw_path_lineto:n { -0.6cm , 0.6cm }
+                        \draw_path_lineto:n { 0.4cm , -0.6cm }
+                        \draw_path_lineto:n { 0.6cm , -0.6cm }
+                        \draw_path_close:
+                        \color_fill:n { black }
+                        \draw_path_use_clear:n { fill , stroke }
+                    
+                        \draw_linewidth:n { 0pt }
+                        \color_select:n { black }
+                        \draw_path_moveto:n { -0.7cm+1pt , 0.6cm+1pt }
+                        \draw_path_lineto:n { 0.7cm+1pt , 0.6cm+1pt }
+                        \draw_path_lineto:n { 0.7cm+1pt , 0.7cm+1pt }
+                        \draw_path_lineto:n { -0.7cm , 0.7cm+1pt }
+                        \draw_path_close:
+                        \color_fill:n { black }
+                    
+                        \draw_path_moveto:n { -0.7cm-1pt , -0.6cm-1pt }
+                        \draw_path_lineto:n { 0.7cm-1pt , -0.6cm-1pt }
+                        \draw_path_lineto:n { 0.7cm-1pt , -0.7cm-1pt }
+                        \draw_path_lineto:n { -0.7cm , -0.7cm-1pt }
+                        \draw_path_close:
+                        \color_fill:n { black }
+                        \draw_path_use_clear:n { fill , stroke }
+                    \draw_end:
+                };
+            \node [right] at (0,0) {@A2SUP};
+        \end{tikzpicture}
+    }
+
+\NewDocumentCommand{\discord}{}
+    {
+        \begin{tikzpicture}[scale=0.2]
+            \draw[fill={rgb,255:red,83;green,100;blue,228}] (-2.9,-1.33) 
+                to[bend~ left=-5] (-1.5,-2.125)
+                to[bend~ left=-5] (-1.167,-1.54)
+                to[bend~ left=5] (-1.625,-1.29)
+                to[bend~ left=-5] (-1.5,-1.167)
+                to[bend~ left=-30] (1.5,-1.167)
+                to[bend~ left=-5] (1.625,-1.29)
+                to[bend~ left=5] (1.167,-1.54)
+                to[bend~ left=-5] (1.5,-2.125)
+                to[bend~ left=-5] (2.9,-1.33)
+                to[bend~ left=-15] (2.08,1.92)
+                to[bend~ left=-5] (0.75,2.29)
+                to[bend~ left=-2] (0.667,1.96)
+                to[bend~ left=-5] (-0.667,1.96)
+                to[bend~ left=-5] (-0.75,2.29)
+                to[bend~ left=-15] (-2.08,1.92)
+                to[bend~ left=-15] (-2.9,-1.33)
+            --cycle;
+            
+            \draw[fill=white] (-1,-0.08) ellipse (0.5~ and~ 0.58);
+            \draw[fill=white] (1,-0.08) ellipse (0.5~ and~ 0.58);
+        \end{tikzpicture}
+    }
+
+
+
+
+
+
+
+
+
+
+\NewDocumentCommand{\annexe}{ o }
+    {
+        \newpage
+        \newcounter{pagezero}
+        \setcounter{pagezero}{\value{page}}
+        \IfNoValueTF{#1}
+            { \includepdf[pages=-, pagecommand={\thispagestyle{empty}}]{annexe.pdf} }
+            { \includepdf[pages=-]{#1} }
+        \setcounter{page}{\value{pagezero}}
+    }
+
+
+\endinput

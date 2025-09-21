@@ -1,0 +1,274 @@
+\documentclass[12pt]{article}
+
+% lien vers documentation : https://drive.google.com/drive/folders/1nm1PBXNYbQI7Wz4dUtG4qTWBp9g9JSPI?usp=sharing
+\usepackage{A2SUP}
+
+\begin{informations}
+    UE = 6,
+    Support = extra,
+    NumeroDuSupport = 1,
+    SujetOuCorrection = ,
+    Orientation = ,
+    Pagination = ,
+    TiersTemps = non,
+    RecoSpecifiques =,
+    TitreExtra = ,
+    SousTitre = ,
+    Team = SPectaculaire,
+    FacRedactionOuCollab = collab,
+    RemerciementsBonus =,
+    Session = ,
+    RelectureProfs = ,
+    Redacteurs = {
+        % NOM Prénom (filière, poste si CA),
+    },
+    Relecteurs = {
+        % NOM Prénom (filière, poste si CA),
+    },
+    ConvertisseursLatex = {
+        % NOM Prénom (filière, poste si CA),
+    },
+    Testeurs = {
+        % NOM Prénom (filière, poste si CA),
+    },
+    TuteursEnSeance = {
+        % NOM Prénom (filière, poste si CA),
+    },
+    VP = {
+        Lùca BLONDEL-JORAND (DFGSM2) et 
+        Souad BENABDI (DFGSM2)
+        % Eugénie Gauthier-Lescop (DFGSM2) et
+        % Suzon Vivi (DFGSM2)
+    },
+    RM = {
+        % NOM Prénom (filière, poste),
+    },
+\end{informations}
+
+
+
+
+
+
+
+
+
+
+\begin{document}
+
+\recto
+\grille
+
+
+\begin{motRM}[
+        titre=Mot de votre RM,
+        %%% OPTIONS
+        % color=...,
+        % afficher=toujours OU sujet OU correction (par défaut : correction)
+    ]
+    Ceci est une box pour y mettre un contenu important pour les étudiants 
+\end{motRM}
+
+\newpage
+
+
+\section*{Exercice 1}
+
+\inseparable % si je veux que l'énoncé reste toujours solidaire de la question 1, de façon à ce qu'un saut de page ne s'intercale pas entre les deux.
+
+Ceci est un énoncé introductif de mon exercice 1. Ci-dessous, une équation :
+
+$$
+\int_{\mathbb R} e^{-x^2}\, dx = \sqrt{\pi}
+$$
+
+Et maintenant, voici une image :
+
+\includegraphics[width=0.2\linewidth]{logo.png}
+
+\question{1}
+{
+    Enoncé de la question 1, avec une image.
+    
+    \begin{center}
+        \includegraphics[width=1cm]{logo.png}
+    \end{center}
+}
+{Item A}
+{Item B}
+{Item C}
+{Item D}
+{Item E}
+{ABCDE}
+
+\begin{correction}
+    \correctionitem{Item A}
+    L'item A est \uline{vrai}. Si l'on pose $I=\int_{\mathbb R} e^{-x^2}\, dx$, alors :
+
+    $$
+    \begin{aligned}
+        I^2 
+            &= \int_{\mathbb R} e^{-x^2}\, dx \times \int_{\mathbb R} e^{-x^2}\, dx\\
+            &= \int_{\mathbb R} e^{-x^2}\, dx \times \int_{\mathbb R} e^{-y^2}\, dy\\
+            &= \int_{\mathbb R}\int_{\mathbb R} e^{-x^2}e^{-y^2}\, dxdy\\
+            &= \iint_{\mathbb R^2} e^{-x^2-y^2}\, dxdy\\
+            &= \iint_{\mathbb R^2} e^{-\left(x^2+y^2\right)}\, dxdy\\
+            &= \int_{0}^{2\pi}\int_{0}^{+\infty} r\times e^{-r^2}\, dr d\theta
+                \quad
+                    \left(\text{car 
+                        $\begin{cases}
+                            x=r\cos(\theta)\\
+                            y=r\sin(\theta)
+                        \end{cases}$}
+                    \right)\\
+            &= \int_{0}^{2\pi}d\theta\int_{0}^{+\infty} r\times e^{-r^2}\, dr\\
+            &= [\theta]_{0}^{2\pi}\left[-\frac{e^{-r^2}}{2}\right]_{0}^{+\infty}\\
+            &= \left(2\pi - 0\right) \times \left\{-\lim_{x\to +\infty} \left(\frac{e^{-r^2}}{2}\right) + \frac{1}{2}\right\}\\
+            &= \pi\\
+        \iff I &= \sqrt{I^2}\\
+        &= \sqrt{\pi}
+    \end{aligned}
+    $$
+
+    \correctionitem{Item B}
+    Youhou
+    
+    \correctionitem{Item C}
+    Youhou
+    
+    \correctionitem{Item D}
+    Youhou
+    
+    \correctionitem{Item E}
+    Youhou
+\end{correction}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\question{2}
+{
+    Enoncé
+}
+{Item A}
+{Item B}
+{
+    Item C avec une image :
+
+    \begin{center}
+        \includegraphics[width=0.2\linewidth]{logo.png}
+    \end{center}
+}
+{Item D}
+{Item E}
+{CE}
+
+
+\begin{correction}
+    \correctionitem{Item A}
+    Youhou
+    
+    \correctionitem{Item B}
+    Youhou
+    
+    \correctionitem*{Item C} % <--- Ne pas oublier * pour retirer le rappel d'item qui ferait ici une erreur puisqu'il y a une image intégrée dans l'item !!!
+    Youhou
+    
+    \correctionitem{Items D et E}
+    Youhou
+\end{correction}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\inseparable
+
+\begin{center}
+    \begin{tblr}{
+        colspec = { c c c c c c c },
+        hlines = {1pt, black},
+        vlines = {1pt, black},
+    }
+        t (heure)
+            & 0
+            & 10
+            & 20
+            & 30
+            & 40
+            & 50\\ 
+        $z(t)\, (\mu g/L)$
+            & 0
+            & 35
+            & 32
+            & 26
+            & 22
+            & 18\\ 
+    \end{tblr}
+\end{center}
+
+\question{4}
+{
+    Enoncé
+}
+{Item A}
+{Item B}
+{Item C}
+{Item D}
+{Item E}
+{CE}
+
+\begin{correction}
+    \correctionitem{Item A, B, C, D et E}
+    Youhou
+\end{correction}
+
+
+
+\verso
+
+\end{document}
